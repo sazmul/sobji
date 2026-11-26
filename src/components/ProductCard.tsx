@@ -46,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
               <ProduceArtwork
                 visualKey={product.visualKey}
                 imageUrl={product.imageUrl}
-                alt={product.nameEn}
+                alt={`${product.nameEn} (${product.nameBn}) - fresh ${product.categoryNameEn} from ${product.farmerDistrict} at sobji.com`}
               />
             </Link>
 
@@ -200,7 +200,7 @@ export function ProductCard({ product }: ProductCardProps) {
               <ProduceArtwork
                 visualKey={product.visualKey}
                 imageUrl={product.imageUrl}
-                alt={product.nameEn}
+                alt={`${product.nameEn} (${product.nameBn}) - fresh ${product.categoryNameEn} from ${product.farmerDistrict} at sobji.com`}
               />
             </div>
             <div className="flex flex-col justify-between p-6 space-y-4">

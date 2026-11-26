@@ -22,6 +22,7 @@ import { ProductCard } from "./ProductCard";
 import { useApp } from "./Providers";
 import { formatTaka, FREE_DELIVERY_THRESHOLD } from "@/lib/utils";
 import type { CatalogProduct } from "@/lib/catalog";
+import { HOME_FAQS } from "@/lib/seo";
 
 function StorefrontUrlSync({
   onCategory,
@@ -100,12 +101,12 @@ const HERO_SLIDES = [
   {
     eyebrowEn: "Direct From Farmers • Zero Middleman",
     eyebrowBn: "সরাসরি কৃষকের ক্ষেত থেকে • কোনো ফড়িয়া নেই",
-    titleEn: "Dawn-harvested produce, straight to your Dhaka kitchen.",
-    titleBn: "ভোরবেলা তোলা তাজা সবজি, সকাল ৬টা থেকেই আপনার বাসায়।",
+    titleEn: "Fresh Sobji, Shobji & Shak, straight to your Dhaka kitchen.",
+    titleBn: "ভোরবেলা তোলা তাজা সবজি ও শাক, সকাল ৬টা থেকেই আপনার বাসায়।",
     subEn:
-      "Fair price for Bangladeshi farmers and fresher, lower-cost bazar for your family every morning.",
+      "Dawn-harvested vegetables, Lal Shak, Palong Shak, river fish & pure spices delivered daily with 100% formalin-free guarantee.",
     subBn:
-      "কৃষকের ন্যায্য দাম ও আপনার প্রতিদিনের বাজারে সাশ্রয়ী এবং খাঁটি পণ্যের নিশ্চয়তা।",
+      "কৃষকের ন্যায্য দাম ও আপনার প্রতিদিনের তাজা সবজি, শাক ও কাঁচাবাজারের সাশ্রয়ী এবং খাঁটি পণ্যের নিশ্চয়তা।",
     ctaEn: "Shop Fresh Harvest",
     ctaBn: "তাজা সবজি দেখুন",
     img: "/images/hero-basket.jpg",
@@ -331,7 +332,10 @@ export function StorefrontHome({
               <h1 className="text-2xl font-extrabold tracking-tight leading-[1.14] text-gray-900 sm:text-4xl">
                 {lang === "bn" ? activeSlide.titleBn : activeSlide.titleEn}
               </h1>
-              <p className="text-sm leading-relaxed text-gray-600 sm:text-[15px]">
+              <p
+                data-speakable="true"
+                className="text-sm leading-relaxed text-gray-600 sm:text-[15px]"
+              >
                 {lang === "bn" ? activeSlide.subBn : activeSlide.subEn}
               </p>
               <div className="flex flex-wrap gap-2.5 pt-1">
@@ -584,7 +588,7 @@ export function StorefrontHome({
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                     <Image
                       src={thumb}
-                      alt={cat.nameEn}
+                      alt={`${cat.nameEn} (${cat.nameBn}) - fresh sobji & shak online on sobji.com`}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 12vw"
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -849,6 +853,120 @@ export function StorefrontHome({
             >
               {lang === "bn" ? "মেম্বারশিপ দেখুন →" : "Manage Membership →"}
             </Link>
+          </div>
+        </section>
+
+        {/* BILINGUAL SEO GUIDE & FAQ SECTION (Matches FAQPage JSON-LD) */}
+        <section
+          id="faq"
+          className="rounded-2xl border border-gray-200/80 bg-white p-6 sm:p-8 space-y-6"
+        >
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 sm:text-xl">
+                {lang === "bn"
+                  ? "সবজি ও শাক বাজার সম্পর্কিত সাধারণ প্রশ্ন (FAQ)"
+                  : "Fresh Sobji, Shobji & Shak Bazar Guide (FAQ)"}
+              </h2>
+              <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+                {lang === "bn"
+                  ? "ঢাকার অনলাইন কাঁচাবাজার, তাজা শাকসবজি, নদীর মাছ ও ৬০ মিনিট এক্সপ্রেস ডেলিভারির তথ্য।"
+                  : "Everything about ordering formalin-free sobji, leafy shak, Padma fish & daily kacha bazar in Dhaka."}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-1.5 text-xs">
+              {[
+                { href: "/bazar/fresh-vegetables", labelEn: "Fresh Sobji", labelBn: "তাজা সবজি" },
+                { href: "/bazar/leafy-greens", labelEn: "Fresh Shak", labelBn: "তাজা শাক" },
+                { href: "/bazar/fresh-fruits", labelEn: "Fresh Fruits", labelBn: "ফলমূল" },
+                { href: "/bazar/river-fish", labelEn: "Padma Fish", labelBn: "নদীর মাছ" },
+                { href: "/bazar/meat-eggs", labelEn: "Meat & Eggs", labelBn: "মাংস ও ডিম" },
+                { href: "/bazar/spices-herbs", labelEn: "Spices & Moshla", labelBn: "মসলা" },
+                { href: "/bazar/organic-pantry", labelEn: "Ghani Oil & Dal", labelBn: "তেল ও ডাল" },
+                { href: "/bazar/ready-to-cook", labelEn: "Ready to Cook", labelBn: "রেডি-টু-কুক" },
+              ].map((tag) => (
+                <Link
+                  key={tag.href}
+                  href={tag.href}
+                  className="rounded-lg border border-emerald-100 bg-emerald-50/70 px-2.5 py-1 font-medium text-[#0f7b3f] hover:bg-emerald-100 transition"
+                >
+                  {lang === "bn" ? tag.labelBn : tag.labelEn}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              {
+                step: "1",
+                enTitle: "Pick Fresh Sobji, Shak & Fish",
+                bnTitle: "তাজা সবজি, শাক ও মাছ বাছুন",
+                enSub: "Select 250g, 500g, or 1kg farm-direct weights.",
+                bnSub: "২৫০ গ্রাম, ৫০০ গ্রাম বা ১ কেজি ওজন বেছে নিন।",
+              },
+              {
+                step: "2",
+                enTitle: "Choose 6:00 AM or Express Slot",
+                bnTitle: "ভোর ৬টা বা এক্সপ্রেস স্লট দিন",
+                enSub: "Delivered across 12 Dhaka areas daily 6 AM - 10 PM.",
+                bnSub: "ঢাকার ১২টি এলাকায় ভোর ৬টা - রাত ১০টা ডেলিভারি।",
+              },
+              {
+                step: "3",
+                enTitle: "Pay Easily & Track Live",
+                bnTitle: "সহজ পেমেন্ট ও লাইভ ট্র্যাকিং",
+                enSub: "Cash on Delivery, bKash, Nagad or Card (Free ৳499+).",
+                bnSub: "ক্যাশ অন ডেলিভারি, বিকাশ, নগদ বা কার্ড (৪৯৯৳+ ফ্রি)।",
+              },
+            ].map((s) => (
+              <div
+                key={s.step}
+                className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50/40 p-3.5"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0f7b3f] text-xs font-bold text-white">
+                  {s.step}
+                </span>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">
+                    {lang === "bn" ? s.bnTitle : s.enTitle}
+                  </p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-gray-600">
+                    {lang === "bn" ? s.bnSub : s.enSub}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {HOME_FAQS.map((faq) => (
+              <div
+                key={faq.questionEn}
+                className="rounded-xl border border-gray-100 bg-[#f9faf9] p-4 sm:p-5"
+              >
+                <h3 className="text-sm font-bold text-gray-900">
+                  {lang === "bn" ? faq.questionBn : faq.questionEn}
+                </h3>
+                <p
+                  data-speakable="true"
+                  className="mt-1.5 text-xs leading-relaxed text-gray-600 sm:text-[13px]"
+                >
+                  {lang === "bn" ? faq.answerBn : faq.answerEn}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-gray-100 pt-4 text-xs text-gray-500 flex flex-wrap items-center justify-between gap-2">
+            <span>
+              {lang === "bn"
+                ? "ঢাকা ডেলিভারি এলাকা: ধানমন্ডি, গুলশান, বনানী, বারিধারা, উত্তরা, মিরপুর, মোহাম্মদপুর, বসুন্ধরা, বাড্ডা, রামপুরা, খিলগাঁও ও মতিঝিল।"
+                : "Dhaka Delivery Areas: Dhanmondi, Gulshan, Banani, Baridhara, Uttara, Mirpur, Mohammadpur, Bashundhara R/A, Badda, Rampura, Khilgaon & Motijheel."}
+            </span>
+            <span className="font-semibold text-[#0f7b3f]">
+              {lang === "bn" ? "সকাল ৬টা - রাত ১০টা ডেলিভারি" : "6:00 AM - 10:00 PM Daily"}
+            </span>
           </div>
         </section>
       </main>

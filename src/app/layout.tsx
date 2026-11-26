@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { PRIMARY_SEO_KEYWORDS, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -10,9 +11,78 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "sobji.com | Fresh Vegetables & Online Bazar in Bangladesh",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default:
+      "sobji.com | Fresh Vegetables (Shobji), Shak & Online Bazar in Dhaka",
+    template: `%s | ${SITE_NAME}`,
+  },
   description:
-    "Straight from the field with zero middlemen. Order fresh vegetables, leafy greens (shak), river fish, fruits, and pure spices with 6:00 AM delivery across Dhaka.",
+    "Order dawn-harvested vegetables (sobji / shobji), fresh shak (lal shak, palong shak, pui shak), fruits, Padma river fish, and spices online in Dhaka. 100% formalin-free kacha bazar delivered from 6:00 AM.",
+  keywords: PRIMARY_SEO_KEYWORDS,
+  applicationName: SITE_NAME,
+  authors: [{ name: "sobji.com" }],
+  creator: "sobji.com",
+  publisher: "sobji.com",
+  category: "Grocery & Fresh Produce",
+  appleWebApp: {
+    capable: true,
+    title: "sobji.com",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: true,
+    email: true,
+  },
+  alternates: {
+    canonical: "/",
+    languages: {
+      "en-BD": "/",
+      "bn-BD": "/",
+      "x-default": "/",
+    },
+  },
+  verification: {
+    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+      ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+      : {}),
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: ["bn_BD"],
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: "sobji.com | Fresh Vegetables (Shobji), Shak & Online Bazar in Dhaka",
+    description:
+      "5:00 AM farm-direct vegetables (sobji / shobji), fresh shak, Padma river fish & pure spices delivered across Dhaka from 6:00 AM.",
+    images: [
+      {
+        url: "/images/hero-basket.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Fresh vegetables (sobji), shak and kacha bazar basket from sobji.com",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "sobji.com | Fresh Vegetables (Shobji), Shak & Online Bazar",
+    description:
+      "Farm-direct sobji, shobji, shak, river fish & spices in Dhaka with 6:00 AM morning delivery.",
+    images: ["/images/hero-basket.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

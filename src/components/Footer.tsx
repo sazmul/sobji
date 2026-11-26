@@ -18,11 +18,13 @@ import { t } from "@/lib/i18n";
 
 const SHOP_LINKS = [
   { href: "/#catalog", en: "All Fresh Bazar", bn: "সকল তাজা পণ্য" },
-  { href: "/?category=fresh-vegetables#catalog", en: "Fresh Vegetables", bn: "তাজা সবজি" },
-  { href: "/?category=leafy-greens#catalog", en: "Leafy Greens (Shak)", bn: "শাকসবজি ও ধনেপাতা" },
-  { href: "/?category=ready-to-cook#catalog", en: "Ready to Cook", bn: "রেডি-টু-কুক প্যাক" },
-  { href: "/?category=river-fish#catalog", en: "Padma River Fish", bn: "তাজা নদীর মাছ" },
-  { href: "/?category=spices-herbs#catalog", en: "Spices & Ghani Oil", bn: "মসলা ও ঘানির তেল" },
+  { href: "/bazar/fresh-vegetables", en: "Fresh Vegetables (Sobji)", bn: "তাজা সবজি" },
+  { href: "/bazar/leafy-greens", en: "Leafy Greens (Shak)", bn: "তাজা শাক-পাতা" },
+  { href: "/bazar/fresh-fruits", en: "Fresh Fruits", bn: "তাজা ফলমূল" },
+  { href: "/bazar/river-fish", en: "Padma River Fish", bn: "তাজা নদীর মাছ" },
+  { href: "/bazar/meat-eggs", en: "Deshi Chicken & Eggs", bn: "মুরগি ও হাঁসের ডিম" },
+  { href: "/bazar/spices-herbs", en: "Spices (Moshla) & Herbs", bn: "মসলা ও পেঁয়াজ-রসুন" },
+  { href: "/bazar/organic-pantry", en: "Ghani Oil & Dal", bn: "ঘানির তেল ও ডাল" },
 ];
 
 const SERVICE_LINKS = [

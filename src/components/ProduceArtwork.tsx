@@ -14,6 +14,7 @@ const fallbackImageByKey: Record<string, string> = {
   potato: "/images/products/potato.jpg",
   brinjal: "/images/products/brinjal.jpg",
   gourd: "/images/products/gourd.jpg",
+  "lal-shak": "/images/products/lal-shak.jpg",
   spinach: "/images/products/palong-shak.jpg",
   chilli: "/images/products/kacha-morich.jpg",
   onion: "/images/products/onion.jpg",
