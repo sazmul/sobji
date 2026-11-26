@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Heart, Plus, Minus, ShoppingCart, MapPin } from "lucide-react";
+import { Heart, Plus, Minus } from "lucide-react";
 import { ProduceArtwork } from "./ProduceArtwork";
 import { useApp } from "./Providers";
 import { formatTaka } from "@/lib/utils";
@@ -37,9 +37,9 @@ export function ProductCard({ product }: ProductCardProps) {
       : 0;
 
   return (
-    <article className="group flex flex-col justify-between rounded-xl border border-[#e4eae5] bg-white overflow-hidden transition-all duration-200 hover:border-[#16803c]/60 hover:shadow-md">
+    <article className="group flex flex-col justify-between rounded-lg border border-[#e5e7eb] bg-white overflow-hidden transition hover:border-[#b9c4bc]">
       <div>
-        <div className="relative aspect-[4/3] overflow-hidden bg-[#f6f8f6]">
+        <div className="relative aspect-[4/3] overflow-hidden border-b border-[#f1f3f1] bg-[#fafafa]">
           <Link href={`/products/${product.slug}`} className="block h-full w-full">
             <ProduceArtwork
               visualKey={product.visualKey}
@@ -48,53 +48,45 @@ export function ProductCard({ product }: ProductCardProps) {
             />
           </Link>
 
-          {/* Discount / Offer Badge */}
-          <div className="absolute left-2.5 top-2.5 flex flex-col gap-1">
-            {discountPct > 0 && (
-              <span className="rounded bg-[#f97316] px-2 py-0.5 font-mono text-[11px] font-extrabold text-white shadow-2xs">
-                -{discountPct}%
-              </span>
-            )}
-            {product.isMemberBogo && (
-              <span className="rounded bg-[#16803c] px-2 py-0.5 text-[10px] font-bold text-white shadow-2xs">
-                Member BOGO
-              </span>
-            )}
-          </div>
+          {discountPct > 0 && (
+            <span className="absolute left-2 top-2 rounded bg-[#dc2626] px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">
+              {discountPct}% OFF
+            </span>
+          )}
 
-          {/* Wishlist Heart */}
           <button
             type="button"
             onClick={() => toggleWishlist(product.id, product.nameEn)}
             aria-label="Save to wishlist"
-            className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#5f6f64] shadow-xs hover:text-[#f97316] transition cursor-pointer"
+            className="absolute right-2 top-2 p-1 text-neutral-400 hover:text-[#dc2626] transition cursor-pointer"
           >
             <Heart
               className={`h-4 w-4 ${
-                isWishlisted ? "fill-[#f97316] text-[#f97316]" : ""
+                isWishlisted ? "fill-[#dc2626] text-[#dc2626]" : "fill-white/70"
               }`}
             />
           </button>
-
-          {/* Farmer Origin Strip */}
-          <span className="absolute bottom-2 left-2.5 inline-flex items-center gap-1 rounded bg-white/90 px-2 py-0.5 text-[10px] font-bold text-[#16803c] backdrop-blur-xs">
-            <MapPin className="h-2.5 w-2.5" />
-            {product.farmerDistrict}
-          </span>
         </div>
 
         <div className="p-3.5 pb-2">
-          <Link href={`/products/${product.slug}`} className="block">
-            <h3 className="line-clamp-1 text-sm font-bold text-[#18231c] group-hover:text-[#16803c] transition">
+          <div className="flex items-center justify-between text-[11px] text-[#666666]">
+            <span className="truncate">{product.farmerDistrict}</span>
+            {product.isMemberBogo && (
+              <span className="font-bold text-[#1b8e3d]">Member BOGO</span>
+            )}
+          </div>
+
+          <Link href={`/products/${product.slug}`} className="mt-1 block">
+            <h3 className="line-clamp-1 text-sm font-semibold text-[#1a1a1a] group-hover:text-[#1b8e3d]">
               {lang === "bn" ? product.nameBn : product.nameEn}
             </h3>
-            <p className="mt-0.5 line-clamp-1 text-xs text-[#5f6f64]">
-              {lang === "bn" ? product.nameEn : product.nameBn} • {product.badge}
+            <p className="line-clamp-1 text-xs text-[#666666]">
+              {lang === "bn" ? product.nameEn : product.nameBn}
             </p>
           </Link>
 
-          {/* Pack Weight Pills */}
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {/* Weight Options */}
+          <div className="mt-2.5 flex flex-wrap gap-1">
             {product.variants.map((variant) => {
               const active = variant.id === activeVariant.id;
               return (
@@ -102,10 +94,10 @@ export function ProductCard({ product }: ProductCardProps) {
                   key={variant.id}
                   type="button"
                   onClick={() => setSelectedVarId(variant.id)}
-                  className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold transition cursor-pointer ${
+                  className={`rounded border px-2 py-0.5 text-[11px] font-medium cursor-pointer ${
                     active
-                      ? "border-[#16803c] bg-[#eef9f1] text-[#16803c]"
-                      : "border-[#e4eae5] bg-[#f6f8f6] text-[#5f6f64] hover:border-[#16803c]/50"
+                      ? "border-[#1b8e3d] bg-[#f2f9f4] text-[#1b8e3d] font-semibold"
+                      : "border-[#e5e7eb] bg-white text-[#555555] hover:border-[#999999]"
                   }`}
                 >
                   {variant.label}
@@ -116,45 +108,39 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Price + Prominent Supermarket Add-to-Cart */}
-      <div className="p-3.5 pt-2 space-y-2.5">
-        <div className="flex items-baseline justify-between">
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-mono text-lg font-extrabold text-[#16803c]">
-              {formatTaka(activeVariant.priceBdt, lang)}
-            </span>
-            {activeVariant.compareAtBdt && (
-              <span className="font-mono text-xs text-stone-400 line-through">
-                {formatTaka(activeVariant.compareAtBdt, lang)}
-              </span>
-            )}
-          </div>
-          <span className="text-[11px] font-semibold text-[#5f6f64]">
-            ★ {product.ratingAvg.toFixed(1)}
+      <div className="p-3.5 pt-2 space-y-2">
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-base font-bold text-[#1a1a1a]">
+            {formatTaka(activeVariant.priceBdt, lang)}
           </span>
+          {activeVariant.compareAtBdt && (
+            <span className="font-mono text-xs text-[#888888] line-through">
+              {formatTaka(activeVariant.compareAtBdt, lang)}
+            </span>
+          )}
         </div>
 
         {activeVariant.stockQty <= 0 ? (
-          <div className="w-full rounded-lg bg-stone-100 py-2 text-center text-xs font-bold text-stone-500">
-            {lang === "bn" ? "স্টক শেষ" : "Out of Stock"}
+          <div className="w-full rounded border border-[#e5e7eb] bg-[#f7f8f7] py-1.5 text-center text-xs font-semibold text-[#888888]">
+            Out of Stock
           </div>
         ) : cartEntry ? (
-          <div className="flex w-full items-center justify-between rounded-lg bg-[#16803c] px-2 py-1.5 text-white">
+          <div className="flex w-full items-center justify-between rounded bg-[#1b8e3d] px-2 py-1 text-white">
             <button
               type="button"
               onClick={() => updateQty(activeVariant.id, cartEntry.quantity - 1)}
-              className="flex h-7 w-7 items-center justify-center rounded hover:bg-[#126a31] cursor-pointer"
+              className="p-1 hover:bg-[#147230] rounded cursor-pointer"
               aria-label="Decrease"
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
-            <span className="font-mono text-xs font-extrabold">
+            <span className="font-mono text-xs font-bold">
               {cartEntry.quantity} in Bag
             </span>
             <button
               type="button"
               onClick={() => updateQty(activeVariant.id, cartEntry.quantity + 1)}
-              className="flex h-7 w-7 items-center justify-center rounded hover:bg-[#126a31] cursor-pointer"
+              className="p-1 hover:bg-[#147230] rounded cursor-pointer"
               aria-label="Increase"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -179,10 +165,9 @@ export function ProductCard({ product }: ProductCardProps) {
                 isMemberBogo: product.isMemberBogo,
               })
             }
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#eef9f1] py-2 text-xs font-extrabold text-[#16803c] ring-1 ring-[#16803c]/25 hover:bg-[#16803c] hover:text-white transition cursor-pointer"
+            className="w-full rounded bg-[#1b8e3d] py-1.5 text-xs font-bold text-white hover:bg-[#147230] transition cursor-pointer"
           >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            <span>{lang === "bn" ? "ব্যাগে যোগ করুন" : "Add to Cart"}</span>
+            {lang === "bn" ? "কার্টে যোগ করুন" : "Add to Bag"}
           </button>
         )}
       </div>

@@ -2,29 +2,20 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #18231c;
+  --foreground: #1a1a1a;
   --surface: #ffffff;
-  --surface-soft: #f6f8f6;
-  --surface-mint: #eef9f1;
-  --primary: #16803c;
-  --primary-hover: #126a31;
-  --accent: #f97316;
-  --muted: #5f6f64;
-  --border: #e4eae5;
+  --surface-muted: #f7f8f7;
+  --primary: #1b8e3d;
+  --primary-hover: #147230;
+  --danger: #dc2626;
+  --muted: #666666;
+  --border: #e5e7eb;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-soft: var(--surface-soft);
-  --color-surface-mint: var(--surface-mint);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-accent: var(--accent);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --font-sans: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), var(--font-hind), system-ui, -apple-system, sans-serif;
   --font-bangla: var(--font-hind), var(--font-jakarta), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), monospace;
 }
@@ -36,29 +27,24 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
+  font-family: var(--font-jakarta), var(--font-hind), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-.font-display {
-  font-family: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
-  letter-spacing: -0.02em;
-}
-
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f6f4;
+  background: #f3f4f6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c7d3ca;
-  border-radius: 9999px;
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #16803c;
+  background: #1b8e3d;
 }

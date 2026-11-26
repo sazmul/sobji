@@ -4,19 +4,9 @@ import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Clock,
-  Headphones,
-  Leaf,
-  MapPin,
-  ShieldCheck,
-  Sparkles,
-  Tag,
-  TrendingDown,
-  Truck,
-  Utensils,
+  ChevronRight as ArrowSmall,
 } from "lucide-react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
@@ -77,44 +67,38 @@ const CATEGORY_THUMBS: Record<string, string> = {
 
 const HERO_SLIDES = [
   {
-    tagEn: "Straight From The Field • Zero Middleman",
-    tagBn: "সরাসরি ক্ষেত থেকে • কোনো ফড়িয়া নেই",
-    titleEn: "Fair price for the farmer. Lower price for you.",
-    titleBn: "কৃষকের ন্যায্য দাম, আপনার সাশ্রয়ী বাজার।",
-    descEn:
-      "Dawn-harvested vegetables, crispy shak, and chemical-free produce delivered to your Dhaka kitchen starting 6:00 AM.",
-    descBn:
-      "ভোরবেলা সংগ্রহ করা তাজা সবজি, শাক ও বিষমুক্ত নিত্যপণ্য সকাল ৬টা থেকেই আপনার ঢাকার বাসায়।",
-    ctaEn: "Shop Fresh Vegetables",
-    ctaBn: "সবজি বাজার দেখুন",
+    eyebrowEn: "STRAIGHT FROM THE FIELD",
+    eyebrowBn: "সরাসরি কৃষকের ক্ষেত থেকে",
+    titleEn: "No Middleman. Fair price for the farmer, lower price for you.",
+    titleBn: "কোনো ফড়িয়া নেই। কৃষকের ন্যায্য দাম, আপনার সাশ্রয়।",
+    subEn: "Morning-fresh vegetables, shak, river fish & pure spices delivered from 6:00 AM.",
+    subBn: "ভোর ৬টা থেকেই ঢাকায় তাজা সবজি, শাক, নদীর মাছ ও খাঁটি মসলা ডেলিভারি।",
+    ctaEn: "Shop Vegetables",
+    ctaBn: "সবজি দেখুন",
     img: "/images/hero-basket.jpg",
     targetCat: "fresh-vegetables",
   },
   {
-    tagEn: "Freshness Just Landed • 3-Hour Dispatch",
-    tagBn: "ভোরের তাজা কালেকশন • দ্রুত ডেলিভারি",
-    titleEn: "Your Order, Your Time Slot — From 6:00 AM.",
-    titleBn: "আপনার অর্ডার, আপনার পছন্দের ডেলিভারি স্লট।",
-    descEn:
-      "Pick early morning, afternoon, evening, or 60-minute express windows across Dhanmondi, Gulshan, Uttara & Mirpur.",
-    descBn:
-      "ধানমন্ডি, গুলশান, উত্তরা ও মিরপুরসহ পুরো ঢাকায় সকাল, দুপুর বা ৬০ মিনিটে এক্সপ্রেস ডেলিভারি।",
-    ctaEn: "Explore Morning Slots",
-    ctaBn: "স্লট ও বাজার দেখুন",
+    eyebrowEn: "6:00 AM EARLY BIRD DELIVERY",
+    eyebrowBn: "সকাল ৬টা থেকে ডেলিভারি",
+    titleEn: "Freshness Just Landed. Choose Your Own Delivery Slot.",
+    titleBn: "ভোরের তাজা সংগ্রহ — আপনার সুবিধামতো স্লট বেছে নিন।",
+    subEn: "Same-day morning, afternoon, evening, or 60-minute express delivery across Dhaka.",
+    subBn: "সকাল, দুপুর, সন্ধ্যা বা ৬০ মিনিটে এক্সপ্রেস ডেলিভারি পুরো ঢাকায়।",
+    ctaEn: "View Weekly Deals",
+    ctaBn: "অফার দেখুন",
     img: "/images/farm-origin.jpg",
-    targetCat: "leafy-greens",
+    targetCat: "flash",
   },
   {
-    tagEn: "Padma River Catch & Pure Spices",
-    tagBn: "পদ্মার তাজা মাছ ও খাঁটি মসলা",
-    titleEn: "Formalin-Free River Fish & Wooden-Ghani Oil.",
-    titleBn: "ফরমালিনমুক্ত নদীর মাছ ও ঘানির সরিষার তেল।",
-    descEn:
-      "Cleaned & curry-cut Chandpur Rui, Pabna deshi onion, and pure spices — delivered chilled in the same crate.",
-    descBn:
-      "চাঁদপুরের কাটা রুই মাছ, পাবনার দেশি পেঁয়াজ এবং নিজস্ব মিলে ভাঙানো খাঁটি মসলা একসাথে।",
-    ctaEn: "Shop Fish & Spices",
-    ctaBn: "মাছ ও মসলা দেখুন",
+    eyebrowEn: "FORMALIN-FREE RIVER FISH & GHANI OIL",
+    eyebrowBn: "ফরমালিনমুক্ত নদীর মাছ ও ঘানির তেল",
+    titleEn: "Chandpur Padma Rui, Deshi Sonali & Cold-Pressed Oil.",
+    titleBn: "চাঁদপুরের পদ্মার রুই, দেশি মুরগি ও কাঠের ঘানির সরিষার তেল।",
+    subEn: "Cleaned, cut, and packed fresh with zero chemical preservatives.",
+    subBn: "পরিষ্কার করে কেটে কোনো প্রিজারভেটিভ ছাড়াই আপনার দরজায়।",
+    ctaEn: "Shop Fish & Meat",
+    ctaBn: "মাছ ও মাংস দেখুন",
     img: "/images/fresh-fish-spices.jpg",
     targetCat: "river-fish",
   },
@@ -177,14 +161,13 @@ export function StorefrontHome({
     return list;
   }, [products, selectedCategory, selectedBadge, sortBy, searchQuery]);
 
-  // 1-Click Bengali Meal Recipe Combos
   const recipeCombos = useMemo(() => {
     const findProd = (slug: string) => products.find((p) => p.slug === slug);
     const defs = [
       {
         titleEn: "Deshi Bhorta & Dal Kit",
-        titleBn: "দেশি ভর্তা ও ডাল কম্বো",
-        descEn: "Tomato, Lal Shak, Deshi Onion, Green Chilli & Moshur Dal",
+        titleBn: "দেশি ভর্তা ও ডাল প্যাক",
+        descEn: "Tomato, Lal Shak, Deshi Onion, Green Chilli, Moshur Dal",
         slugs: [
           "deshi-vine-tomato",
           "lal-shak-red-amaranth",
@@ -196,7 +179,7 @@ export function StorefrontHome({
       {
         titleEn: "Padma Rui Curry Pack",
         titleBn: "পদ্মার রুই ও সবজি প্যাক",
-        descEn: "Cleaned Padma Rui, Potato, Bottle Gourd & Stone-Ground Turmeric",
+        descEn: "Padma Rui Steaks, Diamond Potato, Bottle Gourd, Turmeric",
         slugs: [
           "padma-rui-fish-cut",
           "munshiganj-diamond-potato",
@@ -205,9 +188,9 @@ export function StorefrontHome({
         ],
       },
       {
-        titleEn: "Busy Morning Kitchen Box",
+        titleEn: "Weekday Quick Kitchen Box",
         titleBn: "সকালের দ্রুত রান্না বক্স",
-        descEn: "Ready-to-Cook Mix Bhaji, Peeled Garlic-Ginger, Eggs & Bananas",
+        descEn: "Ready Mix Bhaji, Peeled Garlic-Ginger, Farm Eggs, Sagar Kola",
         slugs: [
           "ready-to-cook-mixed-bhaji",
           "ready-to-cook-peeled-garlic-ginger",
@@ -249,7 +232,7 @@ export function StorefrontHome({
         maxStock: v.stockQty,
       });
     }
-    showToast(`${combo.titleEn} added to your cart!`);
+    showToast(`${combo.titleEn} added to bag!`);
     setIsCartOpen(true);
   };
 
@@ -262,510 +245,405 @@ export function StorefrontHome({
         onSearchQuery={setSearchQuery}
       />
 
-      <main className="flex-1">
-        {/* HERO SECTION: Main Promotional Carousel + Right Quick Action Cards */}
-        <section className="bg-[#f6f8f6] border-b border-[#e4eae5]">
-          <div className="mx-auto grid max-w-7xl gap-4 px-4 py-5 sm:px-6 lg:grid-cols-12">
-            {/* Main Banner Carousel */}
-            <div className="relative overflow-hidden rounded-2xl border border-[#dce4de] bg-[#143624] text-white lg:col-span-8 min-h-[340px] sm:min-h-[380px] flex items-center">
-              <Image
-                src={activeSlide.img}
-                alt={activeSlide.titleEn}
-                fill
-                priority
-                className="object-cover opacity-45 transition-all duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0e2a1b]/95 via-[#0e2a1b]/75 to-transparent" />
+      {/* Main Storefront Grid: Real Bangladeshi Supermarket Sidebar + Content */}
+      <div className="mx-auto w-full max-w-[1360px] flex-1 px-4 py-5 sm:px-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
+          {/* LEFT DEPARTMENT SIDEBAR (Desktop Sticky — Real Chaldal/Sobji Supermarket Pattern) */}
+          <aside className="hidden lg:block w-60 shrink-0">
+            <div className="sticky top-20 rounded-lg border border-[#e5e7eb] bg-white overflow-hidden">
+              <div className="border-b border-[#e5e7eb] bg-[#f7f8f7] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#333333]">
+                {lang === "bn" ? "ক্যাটাগরি" : "Categories"}
+              </div>
+              <nav className="divide-y divide-[#f3f4f6] text-[13px]">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory("all")}
+                  className={`flex w-full items-center justify-between px-4 py-2.5 text-left transition cursor-pointer ${
+                    selectedCategory === "all"
+                      ? "bg-[#eef7f0] font-bold text-[#1b8e3d]"
+                      : "text-[#333333] hover:bg-[#f9fafb]"
+                  }`}
+                >
+                  <span>{lang === "bn" ? "সব পণ্য" : "All Products"}</span>
+                  <span className="font-mono text-[11px] text-[#888888]">
+                    {products.length}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory("flash")}
+                  className={`flex w-full items-center justify-between px-4 py-2.5 text-left transition cursor-pointer ${
+                    selectedCategory === "flash"
+                      ? "bg-[#fef2f2] font-bold text-[#dc2626]"
+                      : "text-[#dc2626] font-semibold hover:bg-[#fff5f5]"
+                  }`}
+                >
+                  <span>{lang === "bn" ? "সাপ্তাহিক ডিসকাউন্ট" : "Weekly Discounts"}</span>
+                  <ArrowSmall className="h-3.5 w-3.5" />
+                </button>
+                {categories.map((cat) => {
+                  const active = selectedCategory === cat.slug;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSelectedCategory(cat.slug)}
+                      className={`flex w-full items-center justify-between px-4 py-2.5 text-left transition cursor-pointer ${
+                        active
+                          ? "bg-[#eef7f0] font-bold text-[#1b8e3d]"
+                          : "text-[#333333] hover:bg-[#f9fafb]"
+                      }`}
+                    >
+                      <span className="truncate">
+                        {lang === "bn" ? cat.nameBn : cat.nameEn}
+                      </span>
+                      <ArrowSmall className="h-3.5 w-3.5 text-[#9ca3af] shrink-0" />
+                    </button>
+                  );
+                })}
+              </nav>
 
-              <div className="relative z-10 max-w-xl p-7 sm:p-10 space-y-4">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-emerald-200 backdrop-blur-xs">
-                  <Leaf className="h-3.5 w-3.5 text-emerald-300" />
-                  {lang === "bn" ? activeSlide.tagBn : activeSlide.tagEn}
-                </span>
-                <h1 className="text-2xl font-extrabold leading-tight sm:text-4xl">
-                  {lang === "bn" ? activeSlide.titleBn : activeSlide.titleEn}
-                </h1>
-                <p className="text-sm leading-relaxed text-emerald-100/90">
-                  {lang === "bn" ? activeSlide.descBn : activeSlide.descEn}
+              <div className="border-t border-[#e5e7eb] bg-[#f7f8f7] p-4 space-y-2 text-xs">
+                <p className="font-bold text-[#1a1a1a]">Promo Codes</p>
+                <p className="font-mono text-[11px] text-[#1b8e3d]">
+                  SOBJI10 · FRESH50
                 </p>
-                <div className="flex flex-wrap gap-3 pt-1">
+                <Link
+                  href="/track?code=SBJ-DEMO01"
+                  className="block pt-1 font-semibold text-[#333333] underline hover:text-[#1b8e3d]"
+                >
+                  Track Order (SBJ-DEMO01)
+                </Link>
+              </div>
+            </div>
+          </aside>
+
+          {/* MAIN CONTENT COLUMN */}
+          <main className="min-w-0 flex-1 space-y-8">
+            {/* BRIGHT, UN-DARKENED RETAIL HERO BANNER */}
+            <section className="relative overflow-hidden rounded-lg border border-[#e5e7eb] bg-[#f4f7f4]">
+              <div className="grid md:grid-cols-12 items-center">
+                <div className="p-6 sm:p-8 md:col-span-6 space-y-3">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#1b8e3d]">
+                    {lang === "bn" ? activeSlide.eyebrowBn : activeSlide.eyebrowEn}
+                  </p>
+                  <h1 className="text-2xl font-extrabold leading-snug text-[#1a1a1a] sm:text-3xl">
+                    {lang === "bn" ? activeSlide.titleBn : activeSlide.titleEn}
+                  </h1>
+                  <p className="text-sm text-[#555555]">
+                    {lang === "bn" ? activeSlide.subBn : activeSlide.subEn}
+                  </p>
+                  <div className="flex flex-wrap gap-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory(activeSlide.targetCat);
+                        document
+                          .getElementById("catalog")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="rounded bg-[#1b8e3d] px-5 py-2.5 text-xs font-bold text-white hover:bg-[#147230] transition cursor-pointer"
+                    >
+                      {lang === "bn" ? activeSlide.ctaBn : activeSlide.ctaEn}
+                    </button>
+                    <a
+                      href="#slots"
+                      className="rounded border border-[#d1d5db] bg-white px-4 py-2.5 text-xs font-bold text-[#1a1a1a] hover:border-[#1b8e3d]"
+                    >
+                      {lang === "bn" ? "ডেলিভারি স্লট" : "Delivery Slots"}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="relative h-56 sm:h-72 md:h-80 md:col-span-6">
+                  <Image
+                    src={activeSlide.img}
+                    alt={activeSlide.titleEn}
+                    fill
+                    priority
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Subtle Slider Arrows */}
+              <button
+                type="button"
+                onClick={() =>
+                  setSlideIdx((s) => (s - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
+                }
+                aria-label="Previous slide"
+                className="absolute left-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1a1a1a] shadow hover:bg-white cursor-pointer"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setSlideIdx((s) => (s + 1) % HERO_SLIDES.length)}
+                aria-label="Next slide"
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1a1a1a] shadow hover:bg-white cursor-pointer"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </section>
+
+            {/* VISUAL CATEGORY TILES (Mobile + Desktop Quick Browse) */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-bold text-[#1a1a1a]">
+                  {lang === "bn" ? "ক্যাটাগরি অনুযায়ী বাজার" : "Explore by Categories"}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory("all")}
+                  className="text-xs font-bold text-[#1b8e3d] hover:underline cursor-pointer"
+                >
+                  View All
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-8">
+                {categories.map((cat) => {
+                  const active = selectedCategory === cat.slug;
+                  const thumb = CATEGORY_THUMBS[cat.slug] || "/images/hero-basket.jpg";
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSelectedCategory(active ? "all" : cat.slug)}
+                      className={`overflow-hidden rounded-lg border text-center transition cursor-pointer ${
+                        active
+                          ? "border-[#1b8e3d] ring-1 ring-[#1b8e3d]"
+                          : "border-[#e5e7eb] bg-white hover:border-[#b9c4bc]"
+                      }`}
+                    >
+                      <div className="aspect-[4/3] w-full overflow-hidden bg-[#f7f8f7]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={thumb}
+                          alt={cat.nameEn}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <p className="truncate px-1.5 py-1.5 text-[11px] font-semibold text-[#1a1a1a]">
+                        {lang === "bn" ? cat.nameBn : cat.nameEn}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* MAIN PRODUCT CATALOG (Right Up Front!) */}
+            <section id="catalog">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e7eb] pb-3 mb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-[#1a1a1a]">
+                    {selectedCategory === "all"
+                      ? lang === "bn"
+                        ? "তাজা সবজি ও দৈনন্দিন বাজার"
+                        : "Fresh Produce & Daily Bazar"
+                      : selectedCategory === "flash"
+                        ? lang === "bn"
+                          ? "সাপ্তাহিক ডিসকাউন্ট"
+                          : "Weekly Discounts"
+                        : categories.find((c) => c.slug === selectedCategory)?.[
+                            lang === "bn" ? "nameBn" : "nameEn"
+                          ]}
+                  </h2>
+                  <p className="text-xs text-[#666666]">
+                    {filteredProducts.length} items available
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {["all", "Organic", "Deshi", "Farm Direct"].map((b) => (
+                    <button
+                      key={b}
+                      type="button"
+                      onClick={() => setSelectedBadge(b)}
+                      className={`rounded border px-2.5 py-1 text-xs font-medium cursor-pointer ${
+                        selectedBadge === b
+                          ? "border-[#1b8e3d] bg-[#1b8e3d] text-white"
+                          : "border-[#e5e7eb] bg-white text-[#444444] hover:border-[#1b8e3d]"
+                      }`}
+                    >
+                      {b === "all" ? "All" : b}
+                    </button>
+                  ))}
+
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="rounded border border-[#e5e7eb] bg-white px-2.5 py-1 text-xs font-medium text-[#1a1a1a] cursor-pointer"
+                  >
+                    <option value="featured">Sort: Featured</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="rating">Top Rated</option>
+                  </select>
+                </div>
+              </div>
+
+              {filteredProducts.length === 0 ? (
+                <div className="rounded-lg border border-[#e5e7eb] bg-[#f7f8f7] p-10 text-center">
+                  <p className="text-sm font-semibold text-[#1a1a1a]">
+                    No items found for this filter.
+                  </p>
                   <button
                     type="button"
                     onClick={() => {
-                      setSelectedCategory(activeSlide.targetCat);
-                      document
-                        .getElementById("catalog")
-                        ?.scrollIntoView({ behavior: "smooth" });
+                      setSelectedCategory("all");
+                      setSelectedBadge("all");
+                      setSearchQuery("");
                     }}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-5 py-3 text-xs sm:text-sm font-extrabold text-white shadow-md hover:bg-[#15803d] transition cursor-pointer"
+                    className="mt-3 rounded bg-[#1b8e3d] px-4 py-2 text-xs font-bold text-white cursor-pointer"
                   >
-                    <span>{lang === "bn" ? activeSlide.ctaBn : activeSlide.ctaEn}</span>
-                    <ArrowRight className="h-4 w-4" />
+                    Reset Filters
                   </button>
-                  <Link
-                    href="/track"
-                    className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-4 py-3 text-xs sm:text-sm font-bold text-white backdrop-blur-xs hover:bg-white/25 transition"
-                  >
-                    {lang === "bn" ? "অর্ডার ট্র্যাক" : "Track Order"}
-                  </Link>
                 </div>
-              </div>
-
-              {/* Carousel Controls */}
-              <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSlideIdx((s) => (s - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
-                  }
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 cursor-pointer"
-                  aria-label="Previous banner"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <div className="flex gap-1.5">
-                  {HERO_SLIDES.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setSlideIdx(i)}
-                      className={`h-2 rounded-full transition-all cursor-pointer ${
-                        slideIdx === i ? "w-6 bg-white" : "w-2 bg-white/50"
-                      }`}
-                      aria-label={`Slide ${i + 1}`}
-                    />
+              ) : (
+                <div className="grid gap-3.5 grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setSlideIdx((s) => (s + 1) % HERO_SLIDES.length)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 cursor-pointer"
-                  aria-label="Next banner"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+              )}
+            </section>
 
-            {/* Right Stacked Promo Blocks (Iconic Sobji.com.bd UX) */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:col-span-4">
-              <div className="flex flex-col justify-between rounded-2xl border border-emerald-200 bg-[#eef9f1] p-5">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-[#16803c]">
-                    <Clock className="h-4 w-4" />
-                    {lang === "bn" ? "আপনার সময়, আপনার স্লট" : "Your Order, Your Time Slot"}
-                  </span>
-                  <h2 className="mt-1.5 text-lg font-extrabold text-[#18231c]">
-                    {lang === "bn"
-                      ? "সকাল ৬টা থেকে রাত ৯টা ডেলিভারি"
-                      : "Early Morning 6:00 AM Slots Live"}
+            {/* WEEKLY DISCOUNTS ROW (When viewing All) */}
+            {selectedCategory === "all" && flashDeals.length > 0 && (
+              <section id="flash-deals" className="pt-2">
+                <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-2.5 mb-4">
+                  <h2 className="text-base font-bold text-[#1a1a1a]">
+                    {lang === "bn" ? "সাপ্তাহিক ডিসকাউন্ট" : "Weekly Discounts"}
                   </h2>
-                  <p className="mt-1 text-xs text-[#4a5b50]">
-                    Pick morning, express 60-min, or evening delivery across Dhaka.
-                  </p>
-                </div>
-                <a
-                  href="#slots"
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-[#16803c] hover:underline"
-                >
-                  <span>View 5 Delivery Slots</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </a>
-              </div>
-
-              <div className="flex flex-col justify-between rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 p-5">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-orange-600">
-                    <Tag className="h-4 w-4" />
-                    {lang === "bn" ? "ফ্রি মেম্বারশিপ ও অফার" : "Free Membership + Deals"}
+                  <span className="font-mono text-xs font-semibold text-[#dc2626]">
+                    Extra 10% off: SOBJI10
                   </span>
-                  <h2 className="mt-1.5 text-lg font-extrabold text-[#18231c]">
-                    {lang === "bn"
-                      ? "৪৯৯৳+ অর্ডারে ফ্রি ডেলিভারি"
-                      : "Free Membership on ৳499+"}
-                  </h2>
-                  <p className="mt-1 text-xs text-[#5f6f64]">
-                    Get Free Delivery, BOGO Shak &{" "}
-                    <span className="font-mono font-bold text-orange-700">SOBJI10</span>{" "}
-                    10% OFF!
-                  </p>
                 </div>
-                <a
-                  href="#flash-deals"
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-orange-700 hover:underline"
-                >
-                  <span>Shop Weekly Discounts</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </a>
+                <div className="grid gap-3.5 grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
+                  {flashDeals.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* RECIPE COMBO PACKS */}
+            <section id="recipes" className="pt-2">
+              <div className="border-b border-[#e5e7eb] pb-2.5 mb-4">
+                <h2 className="text-base font-bold text-[#1a1a1a]">
+                  {lang === "bn" ? "এক ক্লিকে রান্নার কম্বো" : "Recipes & Ready Bazar Kits"}
+                </h2>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 4 VALUE PILLARS */}
-        <section className="border-b border-[#e4eae5] bg-white">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-5 sm:px-6 lg:grid-cols-4">
-            {[
-              {
-                icon: Leaf,
-                title: lang === "bn" ? "প্রতিদিন ভোরের তাজা" : "Fresh Every Morning",
-                sub: lang === "bn" ? "সকাল ৪:৩০-এ ক্ষেত থেকে তোলা" : "Harvested pre-dawn daily",
-              },
-              {
-                icon: TrendingDown,
-                title: lang === "bn" ? "বাজারের চেয়ে কম দাম" : "Lower Than Bazar Price",
-                sub: lang === "bn" ? "সরাসরি কৃষক, কোনো ফড়িয়া নেই" : "No middleman markup",
-              },
-              {
-                icon: Truck,
-                title: lang === "bn" ? "সকাল ৬টায় ডেলিভারি" : "6:00 AM Fast Delivery",
-                sub: lang === "bn" ? "৩ ঘণ্টার মধ্যে ডেলিভারি শুরু" : "Starts within 3 hours",
-              },
-              {
-                icon: Headphones,
-                title: lang === "bn" ? "২৪/৭ লাইভ অ্যাসিস্ট্যান্ট" : "24/7 Live Assistant",
-                sub: lang === "bn" ? "হোয়াটসঅ্যাপ ও ২৪ ঘণ্টায় রিটার্ন" : "WhatsApp & 24h replacement",
-              },
-            ].map((pillar, i) => {
-              const Icon = pillar.icon;
-              return (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#eef9f1] text-[#16803c]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-extrabold text-[#18231c]">
-                      {pillar.title}
-                    </p>
-                    <p className="text-[11px] text-[#5f6f64]">{pillar.sub}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* EXPLORE BY CATEGORIES (Visual Photo Cards) */}
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h2 className="text-xl font-extrabold text-[#18231c] sm:text-2xl">
-                {lang === "bn" ? "ক্যাটাগরি অনুযায়ী বাজার" : "Explore by Categories"}
-              </h2>
-              <p className="text-xs text-[#5f6f64]">
-                Tap any department to filter fresh produce below
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSelectedCategory("all")}
-              className="text-xs font-extrabold text-[#16803c] hover:underline cursor-pointer"
-            >
-              View All ({products.length})
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-            {categories.map((cat) => {
-              const active = selectedCategory === cat.slug;
-              const thumb = CATEGORY_THUMBS[cat.slug] || "/images/hero-basket.jpg";
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategory(active ? "all" : cat.slug);
-                    document
-                      .getElementById("catalog")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className={`group overflow-hidden rounded-xl border text-center transition cursor-pointer ${
-                    active
-                      ? "border-[#16803c] bg-[#eef9f1] ring-2 ring-[#16803c]/25"
-                      : "border-[#e4eae5] bg-white hover:border-[#16803c]/60 hover:shadow-sm"
-                  }`}
-                >
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#f6f8f6]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={thumb}
-                      alt={cat.nameEn}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-2">
-                    <p className="line-clamp-1 text-xs font-bold text-[#18231c]">
-                      {lang === "bn" ? cat.nameBn : cat.nameEn}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* WEEKLY DISCOUNTS / FLASH DEALS SHELF */}
-        {flashDeals.length > 0 && (
-          <section id="flash-deals" className="bg-[#f6f8f6] py-10 border-y border-[#e4eae5]">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                <div>
-                  <span className="inline-flex items-center gap-1 rounded bg-orange-100 px-2.5 py-0.5 text-[11px] font-extrabold text-orange-700">
-                    <Tag className="h-3 w-3" />
-                    WEEKLY DISCOUNTS
-                  </span>
-                  <h2 className="mt-1.5 text-xl font-extrabold text-[#18231c] sm:text-2xl">
-                    {lang === "bn"
-                      ? "সাপ্তাহিক ডিসকাউন্ট ও ভোরের অফার"
-                      : "Today's Morning Harvest Discounts"}
-                  </h2>
-                </div>
-                <div className="rounded-lg border border-orange-200 bg-white px-3.5 py-2 text-xs font-bold text-[#18231c]">
-                  Coupon:{" "}
-                  <span className="font-mono text-orange-600">SOBJI10</span> (10% Off)
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {flashDeals.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* COMPLETE BAZAR CATALOG */}
-        <section id="catalog" className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-extrabold text-[#18231c] sm:text-2xl">
-                {selectedCategory === "all"
-                  ? lang === "bn"
-                    ? "সব তাজা বাজার"
-                    : "Fresh Produce & Daily Bazar"
-                  : categories.find((c) => c.slug === selectedCategory)?.[
-                      lang === "bn" ? "nameBn" : "nameEn"
-                    ] || "Weekly Discounts"}
-              </h2>
-              <p className="text-xs text-[#5f6f64]">
-                Showing {filteredProducts.length} items • Choose exact pack weights (250g, 500g, 1kg)
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {["all", "Organic", "Deshi", "Farm Direct"].map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setSelectedBadge(b)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                    selectedBadge === b
-                      ? "border-[#16803c] bg-[#16803c] text-white"
-                      : "border-[#e4eae5] bg-white text-[#4a5b50] hover:border-[#16803c]"
-                  }`}
-                >
-                  {b === "all" ? (lang === "bn" ? "সবগুলো" : "All") : b}
-                </button>
-              ))}
-
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-lg border border-[#e4eae5] bg-white px-3 py-1.5 text-xs font-bold text-[#18231c] cursor-pointer"
-              >
-                <option value="featured">Featured</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Top Rated</option>
-              </select>
-            </div>
-          </div>
-
-          {filteredProducts.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#dce4de] bg-[#f6f8f6] p-12 text-center">
-              <p className="text-base font-bold text-[#18231c]">
-                No items matched your search or filter.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedCategory("all");
-                  setSelectedBadge("all");
-                  setSearchQuery("");
-                }}
-                className="mt-4 rounded-lg bg-[#16803c] px-5 py-2.5 text-xs font-bold text-white cursor-pointer"
-              >
-                Show All Items
-              </button>
-            </div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* RECIPES & MEAL COMBOS (1-Click Add to Bag) */}
-        <section id="recipes" className="bg-[#f6f8f6] py-12 border-y border-[#e4eae5]">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#16803c]">
-              <Utensils className="h-4 w-4" />
-              <span>{lang === "bn" ? "রেডি রেসিপি ও কম্বো" : "Recipes & Meal Combos"}</span>
-            </div>
-            <h2 className="mt-1 text-xl font-extrabold text-[#18231c] sm:text-2xl">
-              {lang === "bn"
-                ? "এক ক্লিকেই পুরো রান্নার বাজার"
-                : "One-Click Bengali Kitchen Combos"}
-            </h2>
-            <div className="mt-6 grid gap-5 md:grid-cols-3">
-              {recipeCombos.map((combo, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col justify-between rounded-2xl border border-[#e4eae5] bg-white p-5 shadow-2xs"
-                >
-                  <div>
-                    <div className="flex -space-x-2 mb-4">
-                      {combo.items.slice(0, 4).map((item) => (
-                        <div
-                          key={item.id}
-                          className="h-12 w-12 overflow-hidden rounded-full border-2 border-white bg-[#f6f8f6] shadow-xs"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.imageUrl || "/images/hero-basket.jpg"}
-                            alt={item.nameEn}
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <h3 className="text-base font-extrabold text-[#18231c]">
-                      {lang === "bn" ? combo.titleBn : combo.titleEn}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-[#5f6f64]">
-                      {combo.descEn}
-                    </p>
-                  </div>
-                  <div className="mt-5 flex items-center justify-between border-t border-[#eef2ef] pt-3">
+              <div className="grid gap-3.5 md:grid-cols-3">
+                {recipeCombos.map((combo, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col justify-between rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-4"
+                  >
                     <div>
-                      <p className="text-[11px] text-[#5f6f64]">
-                        {combo.items.length} fresh items
-                      </p>
-                      <p className="font-mono text-base font-extrabold text-[#16803c]">
-                        {formatTaka(combo.total, lang)}
-                      </p>
+                      <h3 className="text-sm font-bold text-[#1a1a1a]">
+                        {lang === "bn" ? combo.titleBn : combo.titleEn}
+                      </h3>
+                      <p className="mt-1 text-xs text-[#666666]">{combo.descEn}</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleAddCombo(combo)}
-                      className="rounded-lg bg-[#16803c] px-4 py-2 text-xs font-bold text-white hover:bg-[#126a31] transition cursor-pointer"
-                    >
-                      Add All to Cart
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FARMERS TRACEABILITY + MEMBERSHIP + SLOTS */}
-        <section id="traceability" className="mx-auto max-w-7xl px-4 py-12 sm:px-6 space-y-10">
-          <div className="grid items-center gap-8 rounded-2xl border border-[#e4eae5] bg-white p-6 sm:p-8 lg:grid-cols-12">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl lg:col-span-5">
-              <Image
-                src="/images/farm-origin.jpg"
-                alt="Direct from Bangladeshi farmers"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="space-y-4 lg:col-span-7">
-              <span className="inline-flex items-center gap-1.5 rounded bg-[#eef9f1] px-2.5 py-1 text-xs font-extrabold text-[#16803c]">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Direct From Farmers • Verified Growers
-              </span>
-              <h2 className="text-2xl font-extrabold text-[#18231c]">
-                {lang === "bn"
-                  ? "বগুড়া, নরসিংদী ও মুন্সিগঞ্জের কৃষকদের কাছ থেকে সরাসরি"
-                  : "No Middleman. Direct Harvest From 6 Partner Districts."}
-              </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {farmers.slice(0, 4).map((f) => (
-                  <div
-                    key={f.id}
-                    className="rounded-xl border border-[#e4eae5] bg-[#f6f8f6] p-3.5"
-                  >
-                    <p className="flex items-center justify-between text-xs font-bold text-[#16803c]">
-                      <span>{lang === "bn" ? f.nameBn : f.name}</span>
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {f.district}
+                    <div className="mt-4 flex items-center justify-between border-t border-[#e5e7eb] pt-3">
+                      <span className="font-mono text-sm font-bold text-[#1b8e3d]">
+                        {formatTaka(combo.total, lang)}
                       </span>
-                    </p>
-                    <p className="mt-1 text-xs font-semibold text-[#18231c]">
-                      {f.specialty}
-                    </p>
+                      <button
+                        type="button"
+                        onClick={() => handleAddCombo(combo)}
+                        className="rounded bg-[#1b8e3d] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#147230] cursor-pointer"
+                      >
+                        Add Pack
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
+            </section>
 
-          <div id="membership" className="grid gap-6 lg:grid-cols-12">
-            <div
-              id="slots"
-              className="rounded-2xl border border-[#e4eae5] bg-white p-6 lg:col-span-7"
-            >
-              <h3 className="text-lg font-extrabold text-[#18231c]">
-                {lang === "bn"
-                  ? "ডেলিভারি টাইম স্লট (ভোর ৬টা থেকে)"
-                  : "Available Dhaka Delivery Time Slots"}
-              </h3>
-              <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                {slots.map((slot) => (
-                  <div
-                    key={slot.id}
-                    className="flex items-center justify-between rounded-xl border border-[#e4eae5] bg-[#f6f8f6] px-4 py-3 text-xs"
-                  >
-                    <span className="font-bold text-[#18231c]">
-                      {lang === "bn" ? slot.labelBn : slot.labelEn}
-                    </span>
-                    <span className="font-mono font-bold text-[#16803c]">
-                      {slot.windowText}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-between rounded-2xl bg-[#16803c] p-6 sm:p-8 text-white lg:col-span-5">
-              <div>
-                <span className="inline-flex items-center gap-1 rounded bg-white/20 px-2.5 py-1 text-[11px] font-extrabold">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  FREE MEMBERSHIP
-                </span>
-                <h3 className="mt-3 text-2xl font-extrabold">
-                  Sobji Card & Member Benefits
+            {/* COMPACT DELIVERY SLOTS, FARMERS & MEMBERSHIP INFO TABLES */}
+            <section id="slots" className="grid gap-4 md:grid-cols-2 pt-2">
+              <div className="rounded-lg border border-[#e5e7eb] bg-white p-5">
+                <h3 className="text-sm font-bold text-[#1a1a1a] mb-3">
+                  {lang === "bn"
+                    ? "ঢাকা ডেলিভারি টাইম স্লট"
+                    : "Dhaka Delivery Time Slots (Starts 6:00 AM)"}
                 </h3>
-                <p className="mt-2 text-xs leading-relaxed text-emerald-50/90">
-                  Place an order of ৳499+ to unlock complimentary membership: Free Delivery,
-                  Buy-1-Get-1 Leafies, and priority WhatsApp & 6:00 AM support.
-                </p>
+                <div className="divide-y divide-[#f3f4f6] text-xs">
+                  {slots.map((slot) => (
+                    <div key={slot.id} className="flex justify-between py-2">
+                      <span className="text-[#333333]">
+                        {lang === "bn" ? slot.labelBn : slot.labelEn}
+                      </span>
+                      <span className="font-mono font-semibold text-[#1b8e3d]">
+                        {slot.windowText}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <Link
-                href="/account"
-                className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-xs font-extrabold text-[#16803c] hover:bg-emerald-50 transition"
+
+              <div
+                id="membership"
+                className="flex flex-col justify-between rounded-lg border border-[#e5e7eb] bg-[#f7f8f7] p-5"
               >
-                <span>Join Free Membership</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#1b8e3d]">
+                    Sobji Membership
+                  </p>
+                  <h3 className="mt-1 text-base font-bold text-[#1a1a1a]">
+                    Free Membership on ৳499+ Orders
+                  </h3>
+                  <ul className="mt-2.5 space-y-1 text-xs text-[#555555]">
+                    <li>• Free Delivery for Members on ৳299+</li>
+                    <li>• Member Buy-1-Get-1 Leafy Greens</li>
+                    <li>• Direct WhatsApp Ordering & Priority Support</li>
+                  </ul>
+                  <p className="mt-3 text-xs text-[#666666]">
+                    Direct growers:{" "}
+                    {farmers
+                      .slice(0, 4)
+                      .map((f) => `${f.name} (${f.district})`)
+                      .join(" · ")}
+                  </p>
+                </div>
+                <Link
+                  href="/account"
+                  className="mt-4 inline-block w-fit rounded bg-[#1b8e3d] px-4 py-2 text-xs font-bold text-white hover:bg-[#147230]"
+                >
+                  Manage Membership →
+                </Link>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+
+      {/* Simple Commercial Trust Strip Before Footer */}
+      <section className="border-t border-[#e5e7eb] bg-[#f7f8f7]">
+        <div className="mx-auto grid max-w-[1360px] grid-cols-2 gap-4 px-4 py-5 text-xs sm:px-6 md:grid-cols-4">
+          <div>
+            <p className="font-bold text-[#1a1a1a]">Fresh Every Morning</p>
+            <p className="text-[#666666]">Harvested straight from fields</p>
           </div>
-        </section>
-      </main>
+          <div>
+            <p className="font-bold text-[#1a1a1a]">Lower Than Bazar Price</p>
+            <p className="text-[#666666]">Direct sourcing, zero middlemen</p>
+          </div>
+          <div>
+            <p className="font-bold text-[#1a1a1a]">6:00 AM Delivery Slots</p>
+            <p className="text-[#666666]">Cash on delivery, bKash & Nagad</p>
+          </div>
+          <div>
+            <p className="font-bold text-[#1a1a1a]">24h Freshness Guarantee</p>
+            <p className="text-[#666666]">Instant replacement if not crisp</p>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>

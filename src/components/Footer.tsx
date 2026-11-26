@@ -11,8 +11,8 @@ export function Footer() {
   const { lang } = useApp();
 
   return (
-    <footer className="mt-16 border-t border-[#e4eae5] bg-[#14261c] text-emerald-50">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+    <footer className="border-t border-[#e5e7eb] bg-[#1f2922] text-neutral-200">
+      <div className="mx-auto max-w-[1360px] px-4 py-10 sm:px-6">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <SobjiLogo light />
