@@ -7,16 +7,11 @@ import {
   Search,
   ShoppingBag,
   User,
-  MapPin,
   X,
   Plus,
   Minus,
   Trash2,
   ArrowRight,
-  Truck,
-  Sparkles,
-  ShieldCheck,
-  Languages,
   LayoutDashboard,
 } from "lucide-react";
 import { SobjiLogo } from "./Logo";
@@ -76,8 +71,7 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
     setShowDropdown(false);
     if (onSearchQuery) {
       onSearchQuery(search);
-      const el = document.getElementById("catalog");
-      el?.scrollIntoView({ behavior: "smooth" });
+      document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
     } else {
       router.push(`/?q=${encodeURIComponent(search)}#catalog`);
     }
@@ -88,39 +82,56 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
 
   return (
     <>
-      {/* Top announcement bar */}
-      <div className="bg-[#14532d] text-emerald-50 text-xs py-2 px-4">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
-          <p className="flex items-center gap-2 font-medium">
-            <span className="inline-flex h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-            <span>{t(lang, "topBanner")}</span>
+      {/* Quiet Editorial Utility Bar */}
+      <div className="bg-[#143624] text-[#e7efe7] text-[11px] tracking-wide border-b border-[#1d4a32]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6">
+          <p className="truncate font-medium">
+            {lang === "bn"
+              ? "ভোর ৬টা থেকে ঢাকা জুড়ে ডেলিভারি • ৪৯৯৳+ অর্ডারে ফ্রি ডেলিভারি"
+              : "Dawn dispatch across Dhaka from 6:00 AM • Complimentary delivery over ৳499"}
           </p>
-          <div className="hidden sm:flex items-center gap-4 text-emerald-200/90">
-            <span className="flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5 text-amber-300" />
-              Dhaka Metro • 6 AM – 9 PM
-            </span>
-            <Link href="/track" className="hover:text-white underline-offset-2 hover:underline">
+          <div className="hidden sm:flex items-center gap-5 text-[#c7d7c9]">
+            <Link href="/track" className="hover:text-white transition">
               {t(lang, "trackOrder")}
             </Link>
+            <Link href="/#traceability" className="hover:text-white transition">
+              {lang === "bn" ? "আমাদের কৃষক" : "Growers"}
+            </Link>
+            <span className="font-mono text-[10px] text-[#e8c6a8]">CODE: SOBJI10</span>
           </div>
         </div>
       </div>
 
-      {/* Main sticky header */}
-      <header className="sticky top-0 z-40 border-b border-[#e4e0d5] bg-[#faf8f3]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link href="/" className="shrink-0">
-            <SobjiLogo />
-          </Link>
+      {/* Main Architectural Header */}
+      <header className="sticky top-0 z-40 border-b border-[#e7e2d8] bg-[#fbf9f5]/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+          <div className="flex items-center gap-8">
+            <Link href="/" className="shrink-0">
+              <SobjiLogo />
+            </Link>
+            <nav className="hidden xl:flex items-center gap-6 text-xs font-semibold uppercase tracking-[0.08em] text-[#4c5b51]">
+              <Link href="/#catalog" className="hover:text-[#112218] transition">
+                {lang === "bn" ? "বাজার" : "Market"}
+              </Link>
+              <Link href="/#traceability" className="hover:text-[#112218] transition">
+                {lang === "bn" ? "উৎস" : "Provenance"}
+              </Link>
+              <Link href="/#slots" className="hover:text-[#112218] transition">
+                {lang === "bn" ? "স্লট" : "Delivery"}
+              </Link>
+              <Link href="/track" className="hover:text-[#112218] transition">
+                {t(lang, "trackOrder")}
+              </Link>
+            </nav>
+          </div>
 
-          {/* Search bar */}
+          {/* Search Bar */}
           <form
             onSubmit={handleSearchSubmit}
-            className="relative hidden md:block flex-1 max-w-xl"
+            className="relative hidden md:block flex-1 max-w-md"
           >
             <div className="relative flex items-center">
-              <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-[#526559]" />
+              <Search className="pointer-events-none absolute left-3.5 h-3.5 w-3.5 text-[#5b695f]" />
               <input
                 type="search"
                 value={search}
@@ -128,12 +139,12 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
                 onFocus={() => search.trim() && setShowDropdown(true)}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
                 placeholder={t(lang, "searchPlaceholder")}
-                className="w-full rounded-full border border-[#dcd7c9] bg-white py-2.5 pl-10 pr-4 text-sm text-[#111c16] placeholder:text-[#7c8c82] shadow-xs transition focus:border-[#166534] focus:outline-none focus:ring-2 focus:ring-[#166534]/15"
+                className="w-full rounded-lg border border-[#ded8cc] bg-white py-2 pl-9 pr-3.5 text-xs text-[#112218] placeholder:text-[#869289] transition focus:border-[#143624] focus:outline-none"
               />
             </div>
 
             {showDropdown && filteredQuick.length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-2xl border border-[#e4e0d5] bg-white shadow-xl z-50">
+              <div className="absolute left-0 right-0 top-full mt-1.5 overflow-hidden rounded-xl border border-[#e7e2d8] bg-white shadow-lg z-50 divide-y divide-[#f1ede5]">
                 {filteredQuick.map((item) => {
                   const defVar =
                     item.variants.find((v) => v.isDefault) ?? item.variants[0];
@@ -141,22 +152,26 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
                     <Link
                       key={item.id}
                       href={`/products/${item.slug}`}
-                      className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-[#f3efe6]/70 transition"
+                      className="flex items-center justify-between gap-3 px-3.5 py-2.5 hover:bg-[#f8f6f1] transition"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 overflow-hidden rounded-xl shrink-0">
-                          <ProduceArtwork visualKey={item.visualKey} />
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-10 w-10 overflow-hidden rounded-md shrink-0">
+                          <ProduceArtwork
+                            visualKey={item.visualKey}
+                            imageUrl={item.imageUrl}
+                            alt={item.nameEn}
+                          />
                         </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[#111c16]">
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-semibold text-[#112218]">
                             {lang === "bn" ? item.nameBn : item.nameEn}
                           </p>
-                          <p className="text-xs text-[#526559]">
-                            {item.farmerDistrict} • {defVar?.label}
+                          <p className="text-[11px] text-[#5b695f]">
+                            {item.farmerDistrict} · {defVar?.label}
                           </p>
                         </div>
                       </div>
-                      <span className="font-mono text-sm font-bold text-[#14532d]">
+                      <span className="font-mono text-xs font-semibold text-[#143624]">
                         {formatTaka(defVar?.priceBdt ?? 0, lang)}
                       </span>
                     </Link>
@@ -166,30 +181,20 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
             )}
           </form>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Right Utility Actions */}
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={toggleLang}
-              title="Switch English / বাংলা"
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#dcd7c9] bg-white px-3 py-2 text-xs font-semibold text-[#111c16] hover:border-[#166534] hover:bg-emerald-50/50 transition cursor-pointer"
+              className="rounded-lg border border-[#ded8cc] bg-white px-2.5 py-2 text-[11px] font-semibold tracking-wide text-[#112218] hover:border-[#143624] transition cursor-pointer"
             >
-              <Languages className="h-3.5 w-3.5 text-[#166534]" />
-              <span>{lang === "en" ? "বাংলা" : "EN"}</span>
+              {lang === "en" ? "বাংলা" : "EN"}
             </button>
-
-            <Link
-              href="/track"
-              className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-[#dcd7c9] bg-white px-3.5 py-2 text-xs font-semibold text-[#111c16] hover:border-[#166534] transition"
-            >
-              <Truck className="h-3.5 w-3.5 text-[#d97706]" />
-              <span>{t(lang, "trackOrder")}</span>
-            </Link>
 
             {userRole === "admin" && (
               <Link
                 href="/admin"
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3.5 py-2 text-xs font-bold text-amber-900 hover:bg-amber-200 transition"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-[#d8c4b5] bg-[#f8efe8] px-3 py-2 text-[11px] font-semibold text-[#7d3710] hover:bg-[#f2e2d5] transition"
               >
                 <LayoutDashboard className="h-3.5 w-3.5" />
                 <span>{t(lang, "adminPanel")}</span>
@@ -198,9 +203,9 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
 
             <Link
               href={session?.user ? "/account" : "/sign-in"}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#dcd7c9] bg-white px-3.5 py-2 text-xs font-semibold text-[#111c16] hover:border-[#166534] transition"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#ded8cc] bg-white px-3 py-2 text-xs font-medium text-[#112218] hover:border-[#143624] transition"
             >
-              <User className="h-3.5 w-3.5 text-[#166534]" />
+              <User className="h-3.5 w-3.5 text-[#5b695f]" />
               <span className="hidden sm:inline">
                 {session?.user
                   ? session.user.name.split(" ")[0]
@@ -211,151 +216,138 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
-              className="inline-flex items-center gap-2 rounded-full bg-[#14532d] px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#166534] transition cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#143624] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#1d4a32] transition cursor-pointer"
             >
-              <ShoppingBag className="h-4 w-4 text-emerald-200" />
-              <span className="hidden sm:inline">{t(lang, "cart")}</span>
-              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#f59e0b] px-1.5 font-mono text-[11px] font-bold text-[#111c16]">
-                {totalCount}
+              <ShoppingBag className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">
+                {lang === "bn" ? "ব্যাগ" : "Bag"}
+              </span>
+              <span className="font-mono text-[11px] text-[#d5e6d7]">
+                ({totalCount})
               </span>
             </button>
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
+        {/* Mobile Search */}
         <div className="px-4 pb-3 md:hidden">
           <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-            <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-[#526559]" />
+            <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[#5b695f]" />
             <input
               type="search"
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder={t(lang, "searchPlaceholder")}
-              className="w-full rounded-full border border-[#dcd7c9] bg-white py-2 pl-10 pr-4 text-sm text-[#111c16] focus:border-[#166534] focus:outline-none"
+              className="w-full rounded-lg border border-[#ded8cc] bg-white py-2 pl-9 pr-3 text-xs text-[#112218] focus:border-[#143624] focus:outline-none"
             />
           </form>
         </div>
       </header>
 
-      {/* Mobile Sticky Bottom Cart Pill */}
+      {/* Mobile Sticky Bottom Bar */}
       {totalCount > 0 && !isCartOpen && (
         <div className="fixed bottom-3 left-4 right-4 z-40 md:hidden">
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
-            className="flex w-full items-center justify-between rounded-2xl bg-[#14532d] px-4 py-3 text-white shadow-xl ring-1 ring-emerald-400/30"
+            className="flex w-full items-center justify-between rounded-xl bg-[#143624] px-4 py-3 text-white shadow-xl"
           >
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-400 font-mono text-xs font-bold text-[#111c16]">
-                {totalCount}
-              </span>
-              <span className="text-sm font-semibold">
-                {lang === "bn" ? "বাজার ব্যাগ দেখুন" : "View Bazar Bag"}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 font-mono text-sm font-bold">
-              <span>{formatTaka(subtotal, lang)}</span>
+            <span className="text-xs font-semibold">
+              {totalCount} {lang === "bn" ? "টি পণ্য ব্যাগে" : "items in bag"}
+            </span>
+            <span className="flex items-center gap-1.5 font-mono text-sm font-semibold">
+              {formatTaka(subtotal, lang)}
               <ArrowRight className="h-4 w-4" />
-            </div>
+            </span>
           </button>
         </div>
       )}
 
-      {/* Slide-Over Cart Drawer */}
+      {/* Architectural Slide-Over Cart Drawer */}
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/45 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex justify-end bg-[#112218]/40 backdrop-blur-[2px]">
           <div
-            className="flex h-full w-full max-w-md flex-col bg-[#faf8f3] shadow-2xl"
+            className="flex h-full w-full max-w-md flex-col border-l border-[#e7e2d8] bg-[#fbf9f5] shadow-2xl"
             role="dialog"
             aria-label="Bazar Bag"
           >
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-[#e4e0d5] bg-white px-5 py-4">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-[#14532d]">
-                  <ShoppingBag className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-[#111c16]">
-                    {t(lang, "cart")} ({totalCount})
-                  </h2>
-                  <p className="text-xs text-[#526559]">
-                    {lang === "bn"
-                      ? "ভোর ৬টা থেকে ডেলিভারি"
-                      : "Fresh dispatch starting 6:00 AM"}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between border-b border-[#e7e2d8] bg-white px-6 py-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-[#112218]">
+                  {t(lang, "cart")} ({totalCount})
+                </h2>
+                <p className="text-[11px] text-[#5b695f]">
+                  {lang === "bn"
+                    ? "ভোর ৬টা থেকে ঢাকা ডেলিভারি"
+                    : "Morning & Express slots available"}
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsCartOpen(false)}
-                className="rounded-full p-2 text-[#526559] hover:bg-[#f3efe6] cursor-pointer"
+                className="rounded-lg p-1.5 text-[#5b695f] hover:bg-[#f5f3ee] cursor-pointer"
                 aria-label="Close bag"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Free Delivery + Sobji Club Progress */}
-            <div className="border-b border-[#e4e0d5] bg-emerald-50/70 px-5 py-3">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#14532d]">
-                <span className="flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+            <div className="border-b border-[#e7e2d8] bg-[#f5f3ee] px-6 py-3">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-[#143624]">
+                <span>
                   {remainingForFree === 0
                     ? lang === "bn"
-                      ? "ফ্রি ডেলিভারি + সবজি ক্লাব আনলক হয়েছে!"
-                      : "Free Delivery + Sobji Club Unlocked!"
+                      ? "ফ্রি ডেলিভারি ও সবজি ক্লাব আনলক হয়েছে"
+                      : "Complimentary delivery + Sobji Club unlocked"
                     : lang === "bn"
-                      ? `আর ${formatTaka(remainingForFree, lang)} যোগ করলে ফ্রি ডেলিভারি!`
-                      : `Add ${formatTaka(remainingForFree)} more for Free Delivery + Club`}
+                      ? `ফ্রি ডেলিভারির জন্য আরও ${formatTaka(remainingForFree, lang)} যোগ করুন`
+                      : `Add ${formatTaka(remainingForFree)} more for free delivery`}
                 </span>
-                <span>{progressToFree}%</span>
+                <span className="font-mono">{progressToFree}%</span>
               </div>
-              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-emerald-200/70">
+              <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-[#ded8cc]">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#16a34a] to-[#f59e0b] transition-all duration-300"
+                  className="h-full bg-[#143624] transition-all duration-300"
                   style={{ width: `${progressToFree}%` }}
                 />
               </div>
             </div>
 
-            {/* Items */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 divide-y divide-[#e7e2d8]">
               {items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100/80 text-[#166534]">
-                    <ShoppingBag className="h-8 w-8" />
-                  </div>
-                  <p className="text-base font-bold text-[#111c16]">
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <ShoppingBag className="h-8 w-8 text-[#9aa59d] mb-3" strokeWidth={1.5} />
+                  <p className="font-display text-lg font-medium text-[#112218]">
                     {lang === "bn"
                       ? "আপনার বাজার ব্যাগ খালি"
                       : "Your bazar bag is empty"}
                   </p>
-                  <p className="mt-1 max-w-xs text-xs text-[#526559]">
+                  <p className="mt-1 max-w-xs text-xs text-[#5b695f]">
                     {lang === "bn"
-                      ? "তাজা সবজি, শাক, ফল ও মাছ যোগ করে ভোরের ডেলিভারি বুক করুন।"
-                      : "Add dawn-harvested vegetables, shak, fruits, or river fish to start."}
+                      ? "তাজা সবজি, শাক ও মাছ বেছে নিন।"
+                      : "Select fresh farm vegetables, shak, or river fish to begin."}
                   </p>
                 </div>
               ) : (
                 items.map((item) => (
-                  <div
-                    key={item.variantId}
-                    className="flex items-center gap-3 rounded-2xl border border-[#e4e0d5] bg-white p-3 shadow-2xs"
-                  >
-                    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                      <ProduceArtwork visualKey={item.visualKey} />
+                  <div key={item.variantId} className="flex items-center gap-3.5 py-4">
+                    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[#e7e2d8]">
+                      <ProduceArtwork
+                        visualKey={item.visualKey}
+                        imageUrl={item.imageUrl}
+                        alt={item.nameEn}
+                      />
                     </div>
                     <div className="min-w-0 flex-1">
                       <Link
                         href={`/products/${item.slug}`}
                         onClick={() => setIsCartOpen(false)}
-                        className="block truncate text-sm font-bold text-[#111c16] hover:text-[#166534]"
+                        className="block truncate text-sm font-semibold text-[#112218] hover:underline"
                       >
                         {lang === "bn" ? item.nameBn : item.nameEn}
                       </Link>
-                      <p className="text-xs text-[#526559]">{item.variantLabel}</p>
-                      <p className="mt-1 font-mono text-sm font-bold text-[#14532d]">
+                      <p className="text-xs text-[#5b695f]">{item.variantLabel}</p>
+                      <p className="mt-1 font-mono text-xs font-semibold text-[#143624]">
                         {formatTaka(item.priceBdt * item.quantity, lang)}
                       </p>
                     </div>
@@ -363,26 +355,26 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
                       <button
                         type="button"
                         onClick={() => removeItem(item.variantId)}
-                        className="text-stone-400 hover:text-red-600 transition cursor-pointer"
-                        aria-label="Remove item"
+                        className="text-[#869289] hover:text-[#a14a18] transition cursor-pointer"
+                        aria-label="Remove"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
-                      <div className="flex items-center gap-1.5 rounded-full border border-[#e4e0d5] bg-[#faf8f3] p-0.5">
+                      <div className="flex items-center rounded-md border border-[#ded8cc] bg-white">
                         <button
                           type="button"
                           onClick={() => updateQty(item.variantId, item.quantity - 1)}
-                          className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-white text-[#111c16] cursor-pointer"
+                          className="p-1.5 text-[#112218] hover:bg-[#f5f3ee] cursor-pointer"
                         >
                           <Minus className="h-3 w-3" />
                         </button>
-                        <span className="min-w-5 text-center font-mono text-xs font-bold">
+                        <span className="min-w-6 text-center font-mono text-xs font-semibold">
                           {item.quantity}
                         </span>
                         <button
                           type="button"
                           onClick={() => updateQty(item.variantId, item.quantity + 1)}
-                          className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-white text-[#111c16] cursor-pointer"
+                          className="p-1.5 text-[#112218] hover:bg-[#f5f3ee] cursor-pointer"
                         >
                           <Plus className="h-3 w-3" />
                         </button>
@@ -393,34 +385,25 @@ export function Navbar({ productsForSearch = [], onSearchQuery }: NavbarProps) {
               )}
             </div>
 
-            {/* Footer */}
             {items.length > 0 && (
-              <div className="border-t border-[#e4e0d5] bg-white p-5 space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#526559]">
-                    {lang === "bn" ? "মোট পণ্যের দাম" : "Bazar Subtotal"}
+              <div className="border-t border-[#e7e2d8] bg-white p-6 space-y-3">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs uppercase tracking-wider text-[#5b695f] font-semibold">
+                    {lang === "bn" ? "সাবটোটাল" : "Subtotal"}
                   </span>
-                  <span className="font-mono text-lg font-extrabold text-[#111c16]">
+                  <span className="font-mono text-xl font-bold text-[#112218]">
                     {formatTaka(subtotal, lang)}
                   </span>
                 </div>
-                <p className="flex items-center gap-1.5 text-xs text-[#526559]">
-                  <ShieldCheck className="h-3.5 w-3.5 text-[#16a34a]" />
-                  <span>
-                    {lang === "bn"
-                      ? "ডেলিভারি স্লট ও কুপন পরবর্তী ধাপে যোগ করুন"
-                      : "Select 6:00 AM slot & apply promo code at checkout"}
-                  </span>
-                </p>
                 <Link
                   href="/checkout"
                   onClick={() => setIsCartOpen(false)}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#14532d] py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#166534] transition"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#143624] py-3.5 text-xs font-semibold uppercase tracking-wider text-white hover:bg-[#1d4a32] transition"
                 >
                   <span>
                     {lang === "bn" ? "চেকআউট করুন" : "Proceed to Checkout"}
                   </span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             )}

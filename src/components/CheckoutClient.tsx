@@ -161,7 +161,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6">
-        <h1 className="text-2xl font-extrabold text-[#111c16] sm:text-3xl">
+        <h1 className="font-display text-3xl font-medium text-[#112218] sm:text-4xl">
           {lang === "bn" ? "চেকআউট ও ডেলিভারি" : "Complete Your Bazar Order"}
         </h1>
         <p className="mt-1 text-sm text-[#526559]">
@@ -427,8 +427,12 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       className="flex items-center justify-between gap-3 text-sm"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl">
-                          <ProduceArtwork visualKey={item.visualKey} />
+                        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-[#e7e2d8]">
+                          <ProduceArtwork
+                            visualKey={item.visualKey}
+                            imageUrl={item.imageUrl}
+                            alt={item.nameEn}
+                          />
                         </div>
                         <div className="min-w-0">
                           <p className="truncate font-bold text-[#111c16]">

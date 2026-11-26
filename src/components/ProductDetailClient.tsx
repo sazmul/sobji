@@ -149,11 +149,15 @@ export function ProductDetailClient({
         <div className="mt-6 grid gap-8 lg:grid-cols-12">
           {/* Left Visual */}
           <div className="lg:col-span-5">
-            <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-[#e4e0d5] bg-white shadow-sm">
-              <ProduceArtwork visualKey={product.visualKey} />
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-[#e7e2d8] bg-[#f5f3ee]">
+              <ProduceArtwork
+                visualKey={product.visualKey}
+                imageUrl={product.imageUrl}
+                alt={product.nameEn}
+              />
               <div className="absolute left-4 top-4 flex gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#14532d] shadow-xs">
-                  <Sprout className="h-3.5 w-3.5 text-[#16a34a]" />
+                <span className="inline-flex items-center gap-1 rounded bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#143624] border border-[#e7e2d8]">
+                  <Sprout className="h-3 w-3 text-[#143624]" />
                   {product.badge}
                 </span>
               </div>
@@ -180,7 +184,7 @@ export function ProductDetailClient({
                 </span>
               </div>
 
-              <h1 className="mt-3 text-3xl font-extrabold text-[#111c16] sm:text-4xl">
+              <h1 className="mt-3 font-display text-3xl font-medium text-[#112218] sm:text-4xl">
                 {lang === "bn" ? product.nameBn : product.nameEn}
               </h1>
               <p className="mt-1 text-base font-medium text-[#526559]">

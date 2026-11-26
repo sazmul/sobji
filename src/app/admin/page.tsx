@@ -209,11 +209,11 @@ export default function AdminPage() {
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">
+            <span className="inline-flex items-center gap-1.5 rounded border border-[#e7e2d8] bg-white px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#a14a18]">
               <LayoutDashboard className="h-3.5 w-3.5" />
               Sobji Operations Console
             </span>
-            <h1 className="mt-2 text-2xl font-extrabold text-[#111c16] sm:text-3xl">
+            <h1 className="mt-2 font-display text-3xl font-medium text-[#112218] sm:text-4xl">
               Admin Command Center
             </h1>
           </div>

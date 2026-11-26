@@ -134,8 +134,8 @@ function TrackInner() {
         </div>
       )}
 
-      <div className="rounded-[2rem] border border-[#e4e0d5] bg-white p-6 sm:p-8 shadow-sm">
-        <h1 className="text-2xl font-extrabold text-[#111c16]">
+      <div className="rounded-2xl border border-[#e7e2d8] bg-white p-6 sm:p-8">
+        <h1 className="font-display text-2xl font-medium text-[#112218] sm:text-3xl">
           {lang === "bn" ? "লাইভ অর্ডার ট্র্যাকার" : "Live Farm-to-Kitchen Order Tracker"}
         </h1>
         <p className="mt-1 text-sm text-[#526559]">

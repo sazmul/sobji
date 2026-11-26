@@ -79,12 +79,12 @@ function SignInInner() {
 
   return (
     <div className="mx-auto w-full max-w-md px-4 py-12">
-      <div className="rounded-[2rem] border border-[#e4e0d5] bg-white p-7 sm:p-9 shadow-sm">
-        <div className="flex items-center gap-2 text-xs font-bold text-[#166534]">
-          <Leaf className="h-4 w-4" />
+      <div className="rounded-2xl border border-[#e7e2d8] bg-white p-7 sm:p-9">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#143624]">
+          <Leaf className="h-3.5 w-3.5" />
           <span>sobji.com Account</span>
         </div>
-        <h1 className="mt-2 text-2xl font-extrabold text-[#111c16]">
+        <h1 className="mt-2 font-display text-2xl font-medium text-[#112218] sm:text-3xl">
           {mode === "signin" ? "Sign in to your Bazar" : "Create your Sobji Account"}
         </h1>
         <p className="mt-1 text-xs text-[#526559]">

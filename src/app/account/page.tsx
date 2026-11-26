@@ -151,12 +151,12 @@ export default function AccountPage() {
           <div className="space-y-8">
             {/* Header & Membership */}
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="flex flex-col justify-between rounded-3xl border border-[#e4e0d5] bg-white p-6 lg:col-span-7">
+              <div className="flex flex-col justify-between rounded-2xl border border-[#e7e2d8] bg-white p-6 lg:col-span-7">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#16a34a]">
+                  <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-[#143624]">
                     Customer Profile
                   </p>
-                  <h1 className="mt-1 text-2xl font-extrabold text-[#111c16]">
+                  <h1 className="mt-1 font-display text-3xl font-medium text-[#112218]">
                     {data.user.name}
                   </h1>
                   <p className="text-sm text-[#526559]">{data.user.email}</p>
@@ -182,7 +182,7 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              <div className="rounded-3xl bg-gradient-to-br from-[#14532d] to-[#0f3f22] p-6 text-white lg:col-span-5">
+              <div className="rounded-2xl bg-[#143624] p-6 text-white lg:col-span-5">
                 <div className="flex items-center justify-between">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-3 py-1 text-xs font-bold text-amber-300">
                     <Sparkles className="h-3.5 w-3.5" />
