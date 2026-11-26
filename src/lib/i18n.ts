@@ -21,7 +21,7 @@ export const dictionary = {
     shopNow: "Shop Fresh Harvest",
     exploreSlots: "6:00 AM Express Slots",
     trust1Title: "Farm-Direct Sourcing",
-    trust1Desc: "Zero middlemen — fair pay for growers, lower prices for you",
+    trust1Desc: "Zero middlemen: fair pay for growers, lower prices for you",
     trust2Title: "6:00 AM Dawn Slots",
     trust2Desc: "Choose morning, afternoon, evening, or 60-min express delivery",
     trust3Title: "24h Freshness Promise",
@@ -74,7 +74,7 @@ export const dictionary = {
     shopNow: "তাজা বাজার শুরু করুন",
     exploreSlots: "সকাল ৬টার ডেলিভারি স্লট",
     trust1Title: "সরাসরি কৃষক থেকে",
-    trust1Desc: "কোনো ফড়িয়া নেই — কৃষকের ন্যায্য দাম, আপনার সাশ্রয়",
+    trust1Desc: "কোনো ফড়িয়া নেই, কৃষকের ন্যায্য দাম ও আপনার সাশ্রয়",
     trust2Title: "সকাল ৬টায় ডেলিভারি",
     trust2Desc: "সকাল, দুপুর, সন্ধ্যা অথবা ৬০ মিনিটে এক্সপ্রেস ডেলিভারি",
     trust3Title: "২৪ ঘণ্টা ফ্রেশ গ্যারান্টি",
@@ -105,7 +105,7 @@ export const dictionary = {
     applyCoupon: "প্রয়োগ",
     orderConfirmed: "অর্ডার সফলভাবে গৃহীত হয়েছে!",
     footerTagline:
-      "বাংলাদেশের কৃষকদের সাথে শহরের রান্নাঘরের সরাসরি সেতুবন্ধন — ভোরের তাজা সবজি, শাক, ফল, নদীর মাছ ও খাঁটি মসলা।",
+      "বাংলাদেশের কৃষকদের সাথে শহরের রান্নাঘরের সরাসরি সেতুবন্ধন: ভোরের তাজা সবজি, শাক, ফল, নদীর মাছ ও খাঁটি মসলা।",
   },
 } as const;
 

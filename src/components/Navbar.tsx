@@ -9,6 +9,8 @@ import {
   User,
   Heart,
   Phone,
+  MapPin,
+  ChevronDown,
   X,
   Plus,
   Minus,
@@ -16,9 +18,10 @@ import {
   ArrowRight,
   LayoutDashboard,
   Languages,
+  Menu,
 } from "lucide-react";
 import { SobjiLogo } from "./Logo";
-import { useApp } from "./Providers";
+import { DHAKA_AREAS, useApp } from "./Providers";
 import { ProduceArtwork } from "./ProduceArtwork";
 import { t } from "@/lib/i18n";
 import { formatTaka, FREE_DELIVERY_THRESHOLD } from "@/lib/utils";
@@ -40,6 +43,8 @@ export function Navbar({
   const {
     lang,
     toggleLang,
+    deliveryArea,
+    setDeliveryArea,
     items,
     wishlistIds,
     toggleWishlist,
@@ -50,10 +55,13 @@ export function Navbar({
     addItem,
     subtotal,
     totalCount,
+    showToast,
   } = useApp();
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isAreaModalOpen, setIsAreaModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const userRole = (session?.user as { role?: string } | undefined)?.role;
@@ -76,6 +84,12 @@ export function Navbar({
   const wishlistedProducts = productsForSearch.filter((p) =>
     wishlistIds.includes(p.id)
   );
+
+  // Cart drawer smart essentials cross-sell
+  const inCartProductIds = new Set(items.map((i) => i.productId));
+  const cartUpsells = productsForSearch
+    .filter((p) => !inCartProductIds.has(p.id))
+    .slice(0, 3);
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -111,17 +125,20 @@ export function Navbar({
   return (
     <>
       {/* Top Bar */}
-      <div className="bg-[#0f7b3f] text-white text-xs">
+      <div className="no-print bg-[#0f7b3f] text-white text-xs">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6">
           <div className="flex items-center gap-4">
-            <span className="inline-flex items-center gap-1.5 font-medium">
+            <a
+              href="tel:+8801885592511"
+              className="inline-flex items-center gap-1.5 font-medium transition hover:text-emerald-100"
+            >
               <Phone className="h-3.5 w-3.5 text-emerald-200" />
-              <span>01700-762544</span>
-            </span>
+              <span>01885-592511</span>
+            </a>
             <span className="hidden sm:inline text-emerald-100">
               {lang === "bn"
-                ? "ঢাকায় ভোর ৬টা থেকে ডেলিভারি • ৪৯৯৳+ অর্ডারে ফ্রি ডেলিভারি"
-                : "6:00 AM Morning Delivery in Dhaka • Free Delivery on ৳499+"}
+                ? `ঢাকায় ভোর ৬টা থেকে ডেলিভারি • ${formatTaka(FREE_DELIVERY_THRESHOLD, lang)}+ অর্ডারে ফ্রি ডেলিভারি`
+                : `6:00 AM Morning Delivery in Dhaka • Free Delivery on ${formatTaka(FREE_DELIVERY_THRESHOLD, "en")}+`}
             </span>
           </div>
           <div className="flex items-center gap-4 text-emerald-50">
@@ -144,12 +161,32 @@ export function Navbar({
       </div>
 
       {/* Main Header */}
-      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <div className="flex items-center gap-7">
+      <header className="no-print sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 sm:gap-3 px-4 py-3 sm:py-3.5 sm:px-6">
+          <div className="flex items-center gap-2.5 sm:gap-5 min-w-0">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open menu"
+              className="xl:hidden inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-[#0f7b3f] hover:text-[#0f7b3f] cursor-pointer"
+            >
+              <Menu className="h-4.5 w-4.5" />
+            </button>
             <Link href="/" className="shrink-0">
-              <SobjiLogo />
+              <SobjiLogo compactOnMobile />
             </Link>
+
+            {/* Live Dhaka Area Picker */}
+            <button
+              type="button"
+              onClick={() => setIsAreaModalOpen(true)}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs hover:border-[#0f7b3f] transition cursor-pointer"
+            >
+              <MapPin className="h-3.5 w-3.5 text-[#0f7b3f]" />
+              <span className="text-gray-500 hidden lg:inline">Deliver to</span>
+              <span className="font-semibold text-gray-900">{deliveryArea}</span>
+              <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+            </button>
 
             <nav className="hidden xl:flex items-center gap-5 text-[13px] font-medium text-gray-600">
               <button
@@ -171,7 +208,7 @@ export function Navbar({
                 onClick={() => handleNavJump("leafy-greens")}
                 className="hover:text-[#0f7b3f] cursor-pointer"
               >
-                {lang === "bn" ? "শাক-পাতা" : "Leafy Greens"}
+                {lang === "bn" ? "শাক-পাতা" : "Shak"}
               </button>
               <button
                 type="button"
@@ -180,13 +217,10 @@ export function Navbar({
               >
                 {lang === "bn" ? "মাছ ও মাংস" : "Fish & Meat"}
               </button>
-              <Link href="/#recipes" className="hover:text-[#0f7b3f]">
-                {lang === "bn" ? "রেসিপি কম্বো" : "Recipes"}
-              </Link>
             </nav>
           </div>
 
-          {/* Clean Search Input */}
+          {/* Search Input */}
           <form
             onSubmit={handleSearchSubmit}
             className="relative hidden md:block flex-1 max-w-md"
@@ -243,7 +277,7 @@ export function Navbar({
           </form>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {userRole === "admin" && (
               <Link
                 href="/admin"
@@ -257,7 +291,7 @@ export function Navbar({
             <button
               type="button"
               onClick={() => setIsWishlistOpen(true)}
-              className="relative inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2.5 text-gray-700 hover:border-[#0f7b3f] hover:text-[#0f7b3f] transition cursor-pointer"
+              className="relative inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 sm:p-2.5 text-gray-700 hover:border-[#0f7b3f] hover:text-[#0f7b3f] transition cursor-pointer"
               aria-label="Wishlist"
             >
               <Heart className="h-4 w-4" />
@@ -270,7 +304,7 @@ export function Navbar({
 
             <Link
               href={session?.user ? "/account" : "/sign-in"}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:border-[#0f7b3f] hover:text-[#0f7b3f] transition"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white p-2 sm:px-3 sm:py-2 text-xs font-semibold text-gray-700 hover:border-[#0f7b3f] hover:text-[#0f7b3f] transition"
             >
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">
@@ -283,7 +317,7 @@ export function Navbar({
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0f7b3f] px-4 py-2 text-xs font-semibold text-white hover:bg-[#0b5e30] transition cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-[#0f7b3f] px-3 py-2 sm:px-4 text-xs font-semibold text-white hover:bg-[#0b5e30] transition cursor-pointer shadow-xs"
             >
               <ShoppingBag className="h-4 w-4" />
               <span className="hidden sm:inline tabular-nums">
@@ -296,34 +330,129 @@ export function Navbar({
           </div>
         </div>
 
-        {/* Mobile Search */}
-        <div className="px-4 pb-3 md:hidden">
-          <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+        {/* Mobile Search & Area */}
+        <div className="flex items-center gap-2 px-4 pb-3 md:hidden">
+          <button
+            type="button"
+            onClick={() => setIsAreaModalOpen(true)}
+            className="shrink-0 inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 px-2.5 py-2 text-xs font-semibold text-gray-800"
+          >
+            <MapPin className="h-3.5 w-3.5 text-[#0f7b3f]" />
+            <span>{deliveryArea}</span>
+          </button>
+          <form onSubmit={handleSearchSubmit} className="relative flex-1 flex items-center">
             <Search className="pointer-events-none absolute left-3 h-4 w-4 text-gray-400" />
             <input
               type="search"
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
+              onFocus={() => search.trim() && setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 180)}
               placeholder={t(lang, "searchPlaceholder")}
               className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-gray-900 focus:border-[#0f7b3f] focus:bg-white focus:outline-none"
             />
+            {showDropdown && filteredQuick.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl z-50 divide-y divide-gray-100">
+                {filteredQuick.map((item) => {
+                  const defVar =
+                    item.variants.find((v) => v.isDefault) ?? item.variants[0];
+                  return (
+                    <Link
+                      key={item.id}
+                      href={`/products/${item.slug}`}
+                      className="flex items-center justify-between gap-3 px-3.5 py-2.5 hover:bg-gray-50"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-9 w-9 overflow-hidden rounded-lg border border-gray-100 shrink-0">
+                          <ProduceArtwork
+                            visualKey={item.visualKey}
+                            imageUrl={item.imageUrl}
+                            alt={item.nameEn}
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-semibold text-gray-900">
+                            {lang === "bn" ? item.nameBn : item.nameEn}
+                          </p>
+                          <p className="text-[11px] text-gray-500">
+                            {item.farmerDistrict} · {defVar?.label}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="tabular-nums text-xs font-bold text-[#0f7b3f]">
+                        {formatTaka(defVar?.priceBdt ?? 0, lang)}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </form>
         </div>
       </header>
 
+      {/* Dhaka Delivery Zone Picker Modal */}
+      {isAreaModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div>
+                <h2 className="text-base font-bold text-gray-900">
+                  Select Dhaka Delivery Area
+                </h2>
+                <p className="text-xs text-gray-500">
+                  Morning 6:00 AM & 60-Min Express slots available
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAreaModalOpen(false)}
+                className="p-1 text-gray-400 hover:text-gray-900 cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {DHAKA_AREAS.map((area) => {
+                const active = area === deliveryArea;
+                return (
+                  <button
+                    key={area}
+                    type="button"
+                    onClick={() => {
+                      setDeliveryArea(area);
+                      setIsAreaModalOpen(false);
+                      showToast(`Delivery zone set to ${area}`, "info");
+                    }}
+                    className={`rounded-xl border px-3 py-2.5 text-left text-xs font-semibold transition cursor-pointer ${
+                      active
+                        ? "border-[#0f7b3f] bg-emerald-50 text-[#0f7b3f]"
+                        : "border-gray-200 text-gray-700 hover:border-[#0f7b3f]"
+                    }`}
+                  >
+                    {area}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Bottom Cart Bar */}
       {totalCount > 0 && !isCartOpen && (
-        <div className="fixed bottom-3 left-4 right-4 z-40 md:hidden">
+        <div className="no-print fixed bottom-3 left-4 right-4 z-40 md:hidden">
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
             className="flex w-full items-center justify-between rounded-xl bg-[#0f7b3f] px-4 py-3 text-white shadow-lg"
           >
-            <span className="text-xs font-semibold">
+            <span className="flex items-center gap-2 text-xs font-semibold">
+              <ShoppingBag className="h-4 w-4" />
               {totalCount} {lang === "bn" ? "টি পণ্য ব্যাগে" : "Items in Bag"}
             </span>
             <span className="flex items-center gap-1.5 tabular-nums text-sm font-bold">
-              {formatTaka(subtotal, lang)}
+              {formatTaka(subtotal, lang)} · {lang === "bn" ? "দেখুন" : "View Bag"}
               <ArrowRight className="h-4 w-4" />
             </span>
           </button>
@@ -432,7 +561,7 @@ export function Navbar({
                   {t(lang, "cart")} ({totalCount})
                 </h2>
                 <p className="text-xs text-gray-500">
-                  Deliveries start at 6:00 AM daily
+                  Delivering to <span className="font-semibold text-gray-800">{deliveryArea}</span>
                 </p>
               </div>
               <button
@@ -464,7 +593,7 @@ export function Navbar({
 
             <div className="flex-1 overflow-y-auto px-5 py-2 divide-y divide-gray-100">
               {items.length === 0 ? (
-                <div className="py-20 text-center">
+                <div className="py-16 text-center">
                   <p className="text-sm font-semibold text-gray-900">
                     {lang === "bn" ? "আপনার কার্ট খালি" : "Your bag is empty"}
                   </p>
@@ -526,6 +655,66 @@ export function Navbar({
                   </div>
                 ))
               )}
+
+              {/* Quick Add Essentials Cross-Sell */}
+              {cartUpsells.length > 0 && remainingForFree > 0 && (
+                <div className="pt-4 pb-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                    Frequently Added Essentials
+                  </p>
+                  <div className="space-y-2">
+                    {cartUpsells.map((u) => {
+                      const v = u.variants.find((x) => x.isDefault) ?? u.variants[0];
+                      if (!v) return null;
+                      return (
+                        <div
+                          key={u.id}
+                          className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-2 text-xs"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="relative h-9 w-9 overflow-hidden rounded-lg shrink-0">
+                              <ProduceArtwork
+                                visualKey={u.visualKey}
+                                imageUrl={u.imageUrl}
+                                alt={u.nameEn}
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate font-semibold text-gray-800">
+                                {u.nameEn}
+                              </p>
+                              <p className="text-[11px] text-gray-500 tabular-nums">
+                                {v.label} · {formatTaka(v.priceBdt)}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              addItem({
+                                productId: u.id,
+                                variantId: v.id,
+                                slug: u.slug,
+                                nameEn: u.nameEn,
+                                nameBn: u.nameBn,
+                                variantLabel: v.label,
+                                priceBdt: v.priceBdt,
+                                compareAtBdt: v.compareAtBdt,
+                                visualKey: u.visualKey,
+                                imageUrl: u.imageUrl,
+                                maxStock: v.stockQty,
+                              })
+                            }
+                            className="rounded-lg border border-[#0f7b3f] px-2.5 py-1 text-[11px] font-semibold text-[#0f7b3f] hover:bg-[#0f7b3f] hover:text-white transition cursor-pointer"
+                          >
+                            + Add
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {items.length > 0 && (
@@ -546,6 +735,98 @@ export function Navbar({
                 </Link>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile & Tablet Navigation Drawer */}
+      {isMobileMenuOpen && (
+        <div className="no-print fixed inset-0 z-50 flex xl:hidden bg-black/40 backdrop-blur-[1px]">
+          <div className="flex h-full w-72 max-w-[85vw] flex-col bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+              <SobjiLogo />
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close menu"
+                className="p-1.5 text-gray-500 hover:text-gray-900 cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-6">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                  {lang === "bn" ? "ক্যাটাগরি" : "Browse Categories"}
+                </p>
+                <div className="mt-2.5 space-y-1 text-sm font-medium">
+                  {[
+                    { slug: "flash", en: "Weekly Deals", bn: "সাপ্তাহিক অফার", accent: true },
+                    { slug: "fresh-vegetables", en: "Fresh Vegetables", bn: "তাজা সবজি" },
+                    { slug: "leafy-greens", en: "Leafy Greens (Shak)", bn: "শাক-পাতা" },
+                    { slug: "ready-to-cook", en: "Ready to Cook", bn: "রেডি-টু-কুক" },
+                    { slug: "river-fish", en: "Fish & Meat", bn: "মাছ ও মাংস" },
+                    { slug: "spices-herbs", en: "Spices & Ghani Oil", bn: "মসলা ও তেল" },
+                  ].map((item) => (
+                    <button
+                      key={item.slug}
+                      type="button"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleNavJump(item.slug);
+                      }}
+                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition cursor-pointer ${
+                        item.accent
+                          ? "bg-orange-50 text-orange-700 font-semibold"
+                          : "text-gray-700 hover:bg-gray-50 hover:text-[#0f7b3f]"
+                      }`}
+                    >
+                      <span>{lang === "bn" ? item.bn : item.en}</span>
+                      <ArrowRight className="h-3.5 w-3.5 opacity-60" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-gray-100 pt-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                  {lang === "bn" ? "অ্যাকাউন্ট ও অর্ডার" : "Account & Orders"}
+                </p>
+                <div className="mt-2.5 space-y-1 text-sm font-medium text-gray-700">
+                  <Link
+                    href="/track"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block rounded-xl px-3 py-2.5 hover:bg-gray-50 hover:text-[#0f7b3f]"
+                  >
+                    {t(lang, "trackOrder")}
+                  </Link>
+                  <Link
+                    href={session?.user ? "/account" : "/sign-in"}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block rounded-xl px-3 py-2.5 hover:bg-gray-50 hover:text-[#0f7b3f]"
+                  >
+                    {session?.user ? t(lang, "myAccount") : t(lang, "signIn")}
+                  </Link>
+                  <Link
+                    href="/checkout"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block rounded-xl px-3 py-2.5 hover:bg-gray-50 hover:text-[#0f7b3f]"
+                  >
+                    {lang === "bn" ? "চেকআউট ও ব্যাগ" : "Checkout & Bag"}
+                  </Link>
+                  {userRole === "admin" && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block rounded-xl bg-amber-50 px-3 py-2.5 font-semibold text-amber-900"
+                    >
+                      {t(lang, "adminPanel")}
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

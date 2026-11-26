@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Kalpurush";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  size-adjust: 122%;
+  src:
+    url("/fonts/kalpurush.woff2") format("woff2"),
+    url("/fonts/kalpurush.ttf") format("truetype");
+  unicode-range: U+0980-09FF, U+200C-200D, U+25CC;
+}
+
 :root {
   --background: #f9faf8;
   --foreground: #111827;
@@ -15,20 +27,22 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), var(--font-hind), system-ui, -apple-system, sans-serif;
-  --font-bangla: var(--font-hind), var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Kalpurush", system-ui, -apple-system, sans-serif;
+  --font-bangla: "Kalpurush", var(--font-inter), system-ui, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), var(--font-hind), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), "Kalpurush", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
 }
 
 .tabular-nums {
@@ -51,4 +65,14 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #0f7b3f;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
 }

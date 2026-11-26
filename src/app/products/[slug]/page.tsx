@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getCatalogProducts, getProductBySlug } from "@/lib/catalog";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
+import { ProductDetailSkeleton } from "@/components/Skeletons";
 
 async function ProductContent({
   params,
@@ -31,13 +32,7 @@ export default function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto max-w-7xl px-6 py-16 text-sm text-[#526559]">
-          Loading harvest details...
-        </div>
-      }
-    >
+    <Suspense fallback={<ProductDetailSkeleton />}>
       <ProductContent params={params} />
     </Suspense>
   );

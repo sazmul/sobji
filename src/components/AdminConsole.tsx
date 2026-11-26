@@ -23,9 +23,17 @@ import {
   CheckCircle2,
   Shield,
   Sparkles,
+  Download,
+  Printer,
+  FileText,
+  MessageSquare,
+  MessageCircle,
+  Star,
 } from "lucide-react";
 import { SobjiLogo } from "./Logo";
 import { useApp } from "./Providers";
+import { DashboardSkeleton } from "./Skeletons";
+import { AdminChatConsole } from "./AdminChatConsole";
 import { formatTaka } from "@/lib/utils";
 
 interface AdminVariant {
@@ -68,20 +76,24 @@ interface AdminOrder {
   customerEmail: string | null;
   deliveryArea: string;
   deliveryAddress: string;
+  deliveryNotes: string | null;
   slotLabel: string;
   deliveryDate: string;
   paymentMethod: string;
   paymentStatus: string;
+  paymentRef: string | null;
   status: string;
   subtotalBdt: number;
   discountBdt: number;
   deliveryFeeBdt: number;
   totalBdt: number;
+  couponCode: string | null;
   createdAt: string;
   items: Array<{
     id: number;
     productNameEn: string;
     variantLabel: string;
+    unitPriceBdt: number;
     quantity: number;
     lineTotalBdt: number;
   }>;
@@ -144,10 +156,22 @@ interface AdminSlot {
   isActive: boolean;
 }
 
+interface AdminReview {
+  id: number;
+  productId: number;
+  productNameEn: string;
+  authorName: string;
+  rating: number;
+  comment: string;
+  verifiedPurchase: boolean;
+  createdAt: string;
+}
+
 interface AdminOverviewData {
   currentAdminId: string;
   stats: {
     totalRevenueBdt: number;
+    avgOrderValueBdt: number;
     totalOrders: number;
     pendingOrdersCount: number;
     activeProducts: number;
@@ -155,7 +179,12 @@ interface AdminOverviewData {
     totalCustomers: number;
     clubMembers: number;
     lowStockCount: number;
+    unreadChatsCount?: number;
+    openChatsCount?: number;
   };
+  dailySeries: Array<{ date: string; label: string; revenueBdt: number; orders: number }>;
+  topProducts: Array<{ nameEn: string; units: number; revenueBdt: number }>;
+  statusCounts: Record<string, number>;
   orders: AdminOrder[];
   products: AdminProduct[];
   categories: AdminCategory[];
@@ -163,6 +192,7 @@ interface AdminOverviewData {
   coupons: AdminCoupon[];
   slots: AdminSlot[];
   users: AdminUser[];
+  reviews: AdminReview[];
 }
 
 type AdminSection =
@@ -172,6 +202,8 @@ type AdminSection =
   | "categories"
   | "users"
   | "farmers"
+  | "reviews"
+  | "chats"
   | "logistics";
 
 const ORDER_STATUSES = [
@@ -192,19 +224,38 @@ const STATUS_STYLE: Record<string, string> = {
   cancelled: "bg-red-50 text-red-700 border-red-200",
 };
 
+function downloadCsv(filename: string, rows: string[][]) {
+  const csv = rows
+    .map((r) => r.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function AdminConsole() {
   const { showToast } = useApp();
   const router = useRouter();
   const [data, setData] = useState<AdminOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [section, setSection] = useState<AdminSection>("overview");
+  const [chatUnreadCount, setChatUnreadCount] = useState(0);
 
   // Search & filters
   const [orderSearch, setOrderSearch] = useState("");
   const [orderStatusFilter, setOrderStatusFilter] = useState("all");
+  const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
+  const [inspectOrder, setInspectOrder] = useState<AdminOrder | null>(null);
+
   const [prodSearch, setProdSearch] = useState("");
   const [prodCatFilter, setProdCatFilter] = useState<number | "all">("all");
+  const [lowStockOnly, setLowStockOnly] = useState(false);
   const [userSearch, setUserSearch] = useState("");
+  const [userFilter, setUserFilter] = useState<"all" | "members" | "admins">("all");
 
   // Modals
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
@@ -212,7 +263,6 @@ export function AdminConsole() {
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
   const [showNewCategory, setShowNewCategory] = useState(false);
 
-  // New Product State
   const [newProd, setNewProd] = useState({
     nameEn: "",
     nameBn: "",
@@ -230,7 +280,6 @@ export function AdminConsole() {
     isFlashDeal: false,
   });
 
-  // Edit Product Variant Helper State
   const [editProdForm, setEditProdForm] = useState({
     nameEn: "",
     nameBn: "",
@@ -247,6 +296,7 @@ export function AdminConsole() {
     isFlashDeal: false,
     isMemberBogo: false,
     variantId: 0,
+    variantLabel: "",
     priceBdt: 0,
     compareAtBdt: "",
     stockQty: 0,
@@ -255,7 +305,6 @@ export function AdminConsole() {
     newVarStock: "40",
   });
 
-  // Category Form State
   const [catForm, setCatForm] = useState({
     nameEn: "",
     nameBn: "",
@@ -264,7 +313,6 @@ export function AdminConsole() {
     sortOrder: 10,
   });
 
-  // Farmer Form State
   const [farmerForm, setFarmerForm] = useState({
     name: "",
     nameBn: "",
@@ -276,7 +324,6 @@ export function AdminConsole() {
     storyBn: "",
   });
 
-  // Coupon & Slot Form State
   const [couponForm, setCouponForm] = useState({
     code: "",
     discountType: "percent" as "percent" | "fixed",
@@ -303,6 +350,7 @@ export function AdminConsole() {
       if (res.ok) {
         const json: AdminOverviewData = await res.json();
         setData(json);
+        setChatUnreadCount(json.stats.unreadChatsCount ?? 0);
         setNewProd((p) => ({
           ...p,
           categoryId: json.categories[0]?.id ?? 1,
@@ -337,6 +385,7 @@ export function AdminConsole() {
       isFlashDeal: prod.isFlashDeal,
       isMemberBogo: prod.isMemberBogo,
       variantId: defVar?.id ?? 0,
+      variantLabel: defVar?.label ?? "",
       priceBdt: defVar?.priceBdt ?? 0,
       compareAtBdt: defVar?.compareAtBdt ? String(defVar.compareAtBdt) : "",
       stockQty: defVar?.stockQty ?? 0,
@@ -367,6 +416,7 @@ export function AdminConsole() {
     };
     if (editProdForm.variantId) {
       payload.variantId = editProdForm.variantId;
+      payload.variantLabel = editProdForm.variantLabel;
       payload.priceBdt = Number(editProdForm.priceBdt);
       payload.compareAtBdt = editProdForm.compareAtBdt
         ? Number(editProdForm.compareAtBdt)
@@ -387,12 +437,25 @@ export function AdminConsole() {
       body: JSON.stringify(payload),
     });
     if (res.ok) {
-      showToast("Product updated successfully");
+      showToast("Product updated");
       setEditingProduct(null);
       loadOverview();
     } else {
       const err = await res.json();
       showToast(err.error || "Failed to update product", "error");
+    }
+  };
+
+  const handleDeleteVariant = async (prodId: number, variantId: number) => {
+    const res = await fetch(`/api/admin/products/${prodId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deleteVariantId: variantId }),
+    });
+    if (res.ok) {
+      showToast("Pack variant deleted");
+      setEditingProduct(null);
+      loadOverview();
     }
   };
 
@@ -476,6 +539,20 @@ export function AdminConsole() {
     });
     if (res.ok) {
       showToast("Order updated");
+      loadOverview();
+    }
+  };
+
+  const handleBulkOrderStatus = async (status: string) => {
+    if (selectedOrderIds.length === 0) return;
+    const res = await fetch("/api/admin/orders/bulk", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderIds: selectedOrderIds, status }),
+    });
+    if (res.ok) {
+      showToast(`${selectedOrderIds.length} orders updated to ${status}`);
+      setSelectedOrderIds([]);
       loadOverview();
     }
   };
@@ -572,6 +649,14 @@ export function AdminConsole() {
     }
   };
 
+  const handleDeleteReview = async (id: number) => {
+    const res = await fetch(`/api/admin/reviews/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      showToast("Review removed");
+      loadOverview();
+    }
+  };
+
   const handleCreateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     const res = await fetch("/api/admin/coupons", {
@@ -631,27 +716,33 @@ export function AdminConsole() {
     if (!data) return [];
     return data.products.filter((p) => {
       const catMatch = prodCatFilter === "all" || p.categoryId === prodCatFilter;
+      const stockMatch = !lowStockOnly || p.variants.some((v) => v.stockQty <= 15);
       const q = prodSearch.trim().toLowerCase();
       const textMatch =
         !q ||
         p.nameEn.toLowerCase().includes(q) ||
         p.nameBn.toLowerCase().includes(q) ||
         p.badge.toLowerCase().includes(q);
-      return catMatch && textMatch;
+      return catMatch && stockMatch && textMatch;
     });
-  }, [data, prodSearch, prodCatFilter]);
+  }, [data, prodSearch, prodCatFilter, lowStockOnly]);
 
   const filteredUsers = useMemo(() => {
     if (!data) return [];
-    const q = userSearch.trim().toLowerCase();
-    if (!q) return data.users;
-    return data.users.filter(
-      (u) =>
+    return data.users.filter((u) => {
+      const typeMatch =
+        userFilter === "all" ||
+        (userFilter === "members" && u.isMember) ||
+        (userFilter === "admins" && u.role === "admin");
+      const q = userSearch.trim().toLowerCase();
+      const qMatch =
+        !q ||
         u.name.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q) ||
-        (u.phone || "").toLowerCase().includes(q)
-    );
-  }, [data, userSearch]);
+        (u.phone || "").toLowerCase().includes(q);
+      return typeMatch && qMatch;
+    });
+  }, [data, userSearch, userFilter]);
 
   const navItems: Array<{ id: AdminSection; label: string; icon: React.ElementType; badge?: number }> = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -660,26 +751,35 @@ export function AdminConsole() {
     { id: "categories", label: "Categories", icon: FolderTree, badge: data?.categories.length },
     { id: "users", label: "Users & Club", icon: Users, badge: data?.users.length },
     { id: "farmers", label: "Farmers", icon: Sprout, badge: data?.farmers.length },
+    { id: "reviews", label: "Reviews", icon: MessageSquare, badge: data?.reviews.length },
+    {
+      id: "chats",
+      label: "Live Chat",
+      icon: MessageCircle,
+      badge: chatUnreadCount > 0 ? chatUnreadCount : data?.stats.openChatsCount || undefined,
+    },
     { id: "logistics", label: "Slots & Coupons", icon: Clock },
   ];
 
   if (loading || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f9faf8] text-sm font-medium text-gray-500">
-        Loading Sobji Operations Console...
+      <div className="min-h-screen bg-[#f9faf8] py-8">
+        <DashboardSkeleton />
       </div>
     );
   }
 
+  const maxDailyRev = Math.max(100, ...data.dailySeries.map((d) => d.revenueBdt));
+
   return (
-    <div className="min-h-screen flex bg-[#f9faf8] text-gray-900">
-      {/* Left Fixed Admin Sidebar (Desktop) */}
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col justify-between border-r border-gray-200 bg-white">
+    <div className="min-h-screen flex bg-[#f9faf8] text-gray-900 overflow-x-clip">
+      {/* Left Fixed Admin Sidebar */}
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col justify-between border-r border-gray-200 bg-white print:hidden">
         <div>
           <div className="border-b border-gray-200 px-5 py-4">
             <SobjiLogo />
             <span className="mt-2 inline-block rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-[#0f7b3f]">
-              Operations Admin
+              Operations Command
             </span>
           </div>
 
@@ -728,17 +828,16 @@ export function AdminConsole() {
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Workspace */}
       <div className="flex-1 min-w-0 flex flex-col">
-        {/* Top Admin Header */}
-        <header className="sticky top-0 z-30 border-b border-gray-200 bg-white px-4 py-3.5 sm:px-8">
+        <header className="sticky top-0 z-30 border-b border-gray-200 bg-white px-4 py-3.5 sm:px-8 print:hidden">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="text-lg font-bold text-gray-900 sm:text-xl capitalize">
+              <h1 className="text-lg font-bold text-gray-900 sm:text-xl">
                 {navItems.find((n) => n.id === section)?.label}
               </h1>
               <p className="text-xs text-gray-500">
-                Real-time store control • Neon Postgres synced
+                Real-time operations synced with Neon Postgres
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -759,7 +858,6 @@ export function AdminConsole() {
             </div>
           </div>
 
-          {/* Mobile Tabs */}
           <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1 lg:hidden">
             {navItems.map((item) => (
               <button
@@ -779,7 +877,7 @@ export function AdminConsole() {
         </header>
 
         <main className="flex-1 p-4 sm:p-8 space-y-6">
-          {/* OVERVIEW SECTION */}
+          {/* OVERVIEW SECTION WITH 7-DAY REVENUE CHART & LEADERBOARD */}
           {section === "overview" && (
             <>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -787,25 +885,25 @@ export function AdminConsole() {
                   {
                     label: "Gross Revenue",
                     value: formatTaka(data.stats.totalRevenueBdt),
-                    sub: `${data.stats.totalOrders} total orders`,
+                    sub: `Avg order: ${formatTaka(data.stats.avgOrderValueBdt)}`,
                     icon: TrendingUp,
                   },
                   {
-                    label: "Active Orders Queue",
+                    label: "Active Dispatch Queue",
                     value: String(data.stats.pendingOrdersCount),
-                    sub: "Pending dispatch / transit",
+                    sub: `${data.stats.totalOrders} total orders`,
                     icon: ShoppingBag,
                   },
                   {
-                    label: "Catalog Health",
+                    label: "Catalog & Inventory",
                     value: `${data.stats.activeProducts} SKUs`,
                     sub: `${data.stats.lowStockCount} low-stock variants (≤15)`,
                     icon: AlertTriangle,
                   },
                   {
-                    label: "Customers & Club",
+                    label: "Users & Sobji Club",
                     value: String(data.stats.totalCustomers),
-                    sub: `${data.stats.clubMembers} Sobji Club members`,
+                    sub: `${data.stats.clubMembers} active Club members`,
                     icon: Users,
                   },
                 ].map((kpi, idx) => {
@@ -828,6 +926,90 @@ export function AdminConsole() {
                 })}
               </div>
 
+              {/* 7-Day Revenue Bar Chart + Top Products */}
+              <div className="grid gap-6 lg:grid-cols-12">
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 lg:col-span-7">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-sm font-bold text-gray-900">
+                        7-Day Revenue Trend
+                      </h2>
+                      <p className="text-xs text-gray-500">
+                        Daily non-cancelled bazar volume (BDT)
+                      </p>
+                    </div>
+                    <span className="tabular-nums text-xs font-semibold text-[#0f7b3f]">
+                      Last 7 Days
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-7 gap-3 items-end h-44 pt-4">
+                    {data.dailySeries.map((day) => {
+                      const heightPct = Math.max(
+                        6,
+                        Math.round((day.revenueBdt / maxDailyRev) * 100)
+                      );
+                      return (
+                        <div
+                          key={day.date}
+                          className="group flex flex-col items-center justify-end h-full gap-2"
+                        >
+                          <div className="relative flex w-full flex-1 items-end justify-center">
+                            <div
+                              className="w-full max-w-[38px] rounded-t-lg bg-[#0f7b3f]/85 group-hover:bg-[#0f7b3f] transition-all"
+                              style={{ height: `${heightPct}%` }}
+                              title={`${day.date}: ${formatTaka(day.revenueBdt)} (${day.orders} orders)`}
+                            />
+                          </div>
+                          <div className="text-center leading-tight">
+                            <p className="text-[11px] font-semibold text-gray-700">
+                              {day.label}
+                            </p>
+                            <p className="tabular-nums text-[10px] text-gray-400">
+                              {day.revenueBdt > 0 ? `৳${day.revenueBdt}` : "৳0"}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 lg:col-span-5">
+                  <h2 className="text-sm font-bold text-gray-900 mb-4">
+                    Top Selling Produce
+                  </h2>
+                  {data.topProducts.length === 0 ? (
+                    <p className="text-xs text-gray-500">No order item sales yet.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {data.topProducts.map((tp, idx) => (
+                        <div
+                          key={tp.nameEn}
+                          className="flex items-center justify-between text-xs border-b border-gray-100 pb-2.5 last:border-0"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-emerald-50 font-bold text-[#0f7b3f] tabular-nums">
+                              {idx + 1}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="truncate font-semibold text-gray-900">
+                                {tp.nameEn}
+                              </p>
+                              <p className="text-gray-500 tabular-nums">
+                                {tp.units} packs sold
+                              </p>
+                            </div>
+                          </div>
+                          <span className="tabular-nums font-bold text-gray-900">
+                            {formatTaka(tp.revenueBdt)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="grid gap-6 lg:grid-cols-12">
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:col-span-7">
                   <div className="flex items-center justify-between mb-4">
@@ -841,7 +1023,7 @@ export function AdminConsole() {
                     </button>
                   </div>
                   <div className="divide-y divide-gray-100">
-                    {data.orders.slice(0, 6).map((ord) => (
+                    {data.orders.slice(0, 5).map((ord) => (
                       <div
                         key={ord.id}
                         className="flex items-center justify-between gap-3 py-3 text-sm"
@@ -889,7 +1071,7 @@ export function AdminConsole() {
                           .filter((v) => v.stockQty <= 25)
                           .map((v) => ({ prod: p, v }))
                       )
-                      .slice(0, 6)
+                      .slice(0, 5)
                       .map(({ prod, v }) => (
                         <div
                           key={v.id}
@@ -918,7 +1100,7 @@ export function AdminConsole() {
             </>
           )}
 
-          {/* ORDERS SECTION */}
+          {/* ORDERS SECTION WITH BULK ACTIONS, CSV EXPORT & INVOICE DRAWER */}
           {section === "orders" && (
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -932,6 +1114,33 @@ export function AdminConsole() {
                     className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-[#0f7b3f] focus:outline-none"
                   />
                 </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      downloadCsv("sobji-orders.csv", [
+                        ["Order Code", "Customer", "Phone", "Area", "Slot", "Status", "Payment", "Total BDT"],
+                        ...filteredOrders.map((o) => [
+                          o.orderCode,
+                          o.customerName,
+                          o.customerPhone,
+                          o.deliveryArea,
+                          o.slotLabel,
+                          o.status,
+                          `${o.paymentMethod} (${o.paymentStatus})`,
+                          String(o.totalBdt),
+                        ]),
+                      ])
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 hover:border-[#0f7b3f] cursor-pointer"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export CSV
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap gap-1.5">
                   {["all", ...ORDER_STATUSES].map((st) => (
                     <button
@@ -948,22 +1157,78 @@ export function AdminConsole() {
                     </button>
                   ))}
                 </div>
+
+                {selectedOrderIds.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs">
+                    <span className="font-bold text-[#0f7b3f]">
+                      {selectedOrderIds.length} selected:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleBulkOrderStatus("packed")}
+                      className="rounded bg-white px-2.5 py-1 font-semibold text-gray-800 border border-gray-200 cursor-pointer"
+                    >
+                      Mark Packed
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleBulkOrderStatus("out_for_delivery")}
+                      className="rounded bg-white px-2.5 py-1 font-semibold text-gray-800 border border-gray-200 cursor-pointer"
+                    >
+                      Out for Delivery
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleBulkOrderStatus("delivered")}
+                      className="rounded bg-[#0f7b3f] px-2.5 py-1 font-semibold text-white cursor-pointer"
+                    >
+                      Mark Delivered
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
                 <table className="w-full text-left text-sm">
                   <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500">
                     <tr>
+                      <th className="px-4 py-3 w-10">
+                        <input
+                          type="checkbox"
+                          checked={
+                            filteredOrders.length > 0 &&
+                            selectedOrderIds.length === filteredOrders.length
+                          }
+                          onChange={(e) =>
+                            setSelectedOrderIds(
+                              e.target.checked ? filteredOrders.map((o) => o.id) : []
+                            )
+                          }
+                        />
+                      </th>
                       <th className="px-4 py-3">Order</th>
                       <th className="px-4 py-3">Customer & Address</th>
-                      <th className="px-4 py-3">Items</th>
                       <th className="px-4 py-3">Payment</th>
-                      <th className="px-4 py-3">Dispatch Status</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3 text-right">Invoice</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {filteredOrders.map((ord) => (
                       <tr key={ord.id} className="hover:bg-gray-50/70">
+                        <td className="px-4 py-3.5 align-top">
+                          <input
+                            type="checkbox"
+                            checked={selectedOrderIds.includes(ord.id)}
+                            onChange={(e) =>
+                              setSelectedOrderIds((prev) =>
+                                e.target.checked
+                                  ? [...prev, ord.id]
+                                  : prev.filter((id) => id !== ord.id)
+                              )
+                            }
+                          />
+                        </td>
                         <td className="px-4 py-3.5 align-top">
                           <p className="tabular-nums font-bold text-[#0f7b3f]">
                             {ord.orderCode}
@@ -977,15 +1242,8 @@ export function AdminConsole() {
                             {ord.customerPhone}
                           </p>
                           <p className="text-xs text-gray-500 max-w-xs">
-                            {ord.deliveryArea} — {ord.deliveryAddress}
+                            {ord.deliveryArea}, {ord.deliveryAddress}
                           </p>
-                        </td>
-                        <td className="px-4 py-3.5 align-top text-xs text-gray-600 max-w-xs">
-                          {ord.items.map((i) => (
-                            <p key={i.id}>
-                              {i.productNameEn} ({i.variantLabel}) × {i.quantity}
-                            </p>
-                          ))}
                         </td>
                         <td className="px-4 py-3.5 align-top">
                           <p className="tabular-nums font-bold text-gray-900">
@@ -1016,6 +1274,16 @@ export function AdminConsole() {
                               </option>
                             ))}
                           </select>
+                        </td>
+                        <td className="px-4 py-3.5 align-top text-right">
+                          <button
+                            type="button"
+                            onClick={() => setInspectOrder(ord)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 hover:border-[#0f7b3f] cursor-pointer"
+                          >
+                            <FileText className="h-3.5 w-3.5" />
+                            Slip
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1056,15 +1324,48 @@ export function AdminConsole() {
                       </option>
                     ))}
                   </select>
+                  <button
+                    type="button"
+                    onClick={() => setLowStockOnly((prev) => !prev)}
+                    className={`rounded-xl border px-3 py-2 text-xs font-semibold transition cursor-pointer ${
+                      lowStockOnly
+                        ? "border-red-300 bg-red-50 text-red-700"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    Low Stock (≤ 15)
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowNewProduct(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#0f7b3f] px-4 py-2 text-xs font-semibold text-white cursor-pointer"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  New Product
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      downloadCsv("sobji-inventory.csv", [
+                        ["ID", "Name EN", "Name BN", "Badge", "Active", "Variants"],
+                        ...filteredProducts.map((p) => [
+                          String(p.id),
+                          p.nameEn,
+                          p.nameBn,
+                          p.badge,
+                          String(p.isActive),
+                          p.variants.map((v) => `${v.label}:৳${v.priceBdt}(${v.stockQty})`).join(" | "),
+                        ]),
+                      ])
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 cursor-pointer"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export CSV
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewProduct(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#0f7b3f] px-4 py-2 text-xs font-semibold text-white cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    New Product
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
@@ -1273,15 +1574,33 @@ export function AdminConsole() {
           {/* USERS & CLUB SECTION */}
           {section === "users" && (
             <div className="space-y-4">
-              <div className="relative max-w-md">
-                <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                <input
-                  type="search"
-                  value={userSearch}
-                  onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Search user by name, email, phone..."
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-[#0f7b3f] focus:outline-none"
-                />
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="relative flex-1 min-w-[220px] max-w-md">
+                  <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                  <input
+                    type="search"
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    placeholder="Search user by name, email, phone..."
+                    className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-[#0f7b3f] focus:outline-none"
+                  />
+                </div>
+                <div className="flex gap-1.5">
+                  {(["all", "members", "admins"] as const).map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setUserFilter(f)}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize cursor-pointer ${
+                        userFilter === f
+                          ? "bg-[#0f7b3f] text-white"
+                          : "border border-gray-200 bg-white text-gray-600"
+                      }`}
+                    >
+                      {f === "all" ? "All Users" : f === "members" ? "Sobji Club" : "Admins"}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
@@ -1469,10 +1788,57 @@ export function AdminConsole() {
             </div>
           )}
 
+          {/* REVIEWS MODERATION SECTION */}
+          {section === "reviews" && (
+            <div className="space-y-3">
+              {data.reviews.length === 0 ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
+                  No customer reviews yet.
+                </div>
+              ) : (
+                data.reviews.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className="flex items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-5"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <span className="font-bold text-[#0f7b3f]">
+                          {rev.productNameEn}
+                        </span>
+                        <span className="text-gray-400">·</span>
+                        <span className="font-semibold text-gray-900">
+                          {rev.authorName}
+                        </span>
+                        <span className="inline-flex items-center gap-0.5 rounded bg-amber-50 px-1.5 py-0.5 font-semibold text-amber-700">
+                          <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                          {rev.rating}.0
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700">{rev.comment}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteReview(rev.id)}
+                      className="rounded-lg border border-gray-200 p-2 text-gray-400 hover:text-red-600 cursor-pointer shrink-0"
+                      title="Delete review"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* LIVE CUSTOMER SUPPORT CHAT SECTION */}
+          {section === "chats" && (
+            <AdminChatConsole onUnreadChange={setChatUnreadCount} />
+          )}
+
           {/* DELIVERY SLOTS & COUPONS SECTION */}
           {section === "logistics" && (
             <div className="grid gap-6 lg:grid-cols-2">
-              {/* Coupons */}
               <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-4">
                 <h2 className="flex items-center gap-2 text-base font-bold text-gray-900">
                   <Tag className="h-4 w-4 text-[#0f7b3f]" />
@@ -1596,7 +1962,6 @@ export function AdminConsole() {
                 </form>
               </div>
 
-              {/* Delivery Slots */}
               <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-4">
                 <h2 className="flex items-center gap-2 text-base font-bold text-gray-900">
                   <Clock className="h-4 w-4 text-[#0f7b3f]" />
@@ -1657,7 +2022,7 @@ export function AdminConsole() {
                       onChange={(e) =>
                         setSlotForm({ ...slotForm, windowText: e.target.value })
                       }
-                      placeholder="Window (e.g. 9:00 PM – 11:00 PM)"
+                      placeholder="Window (e.g. 9:00 PM - 11:00 PM)"
                       className="rounded-xl border border-gray-200 px-3 py-2 text-xs"
                     />
                   </div>
@@ -1674,7 +2039,107 @@ export function AdminConsole() {
         </main>
       </div>
 
-      {/* EDIT PRODUCT MODAL */}
+      {/* PRINTABLE ORDER INVOICE & DISPATCH SLIP MODAL */}
+      {inspectOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-3 print:hidden">
+              <h2 className="text-base font-bold text-gray-900">
+                Dispatch Slip · {inspectOrder.orderCode}
+              </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1 rounded-lg bg-[#0f7b3f] px-3 py-1.5 text-xs font-semibold text-white cursor-pointer"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  Print
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInspectOrder(null)}
+                  className="p-1 text-gray-400 hover:text-gray-900 cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div className="flex justify-between">
+                <div>
+                  <SobjiLogo />
+                  <p className="mt-1 text-gray-500">Kawran Bazar Dawn Hub, Dhaka</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-sm text-gray-900 tabular-nums">
+                    {inspectOrder.orderCode}
+                  </p>
+                  <p className="text-gray-500">{inspectOrder.deliveryDate}</p>
+                  <p className="font-semibold text-[#0f7b3f]">{inspectOrder.slotLabel}</p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 space-y-0.5">
+                <p className="font-bold text-gray-900">{inspectOrder.customerName}</p>
+                <p className="tabular-nums text-gray-600">{inspectOrder.customerPhone}</p>
+                <p className="text-gray-600">
+                  {inspectOrder.deliveryAddress}, {inspectOrder.deliveryArea}
+                </p>
+                {inspectOrder.deliveryNotes && (
+                  <p className="text-gray-500 italic">Note: {inspectOrder.deliveryNotes}</p>
+                )}
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[320px] text-left border-t border-b border-gray-200">
+                  <thead className="text-[11px] uppercase text-gray-500 border-b border-gray-200">
+                    <tr>
+                      <th className="py-2">Item</th>
+                      <th className="py-2 text-center">Qty</th>
+                      <th className="py-2 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {inspectOrder.items.map((it) => (
+                      <tr key={it.id}>
+                        <td className="py-2 font-medium text-gray-900">
+                          {it.productNameEn} ({it.variantLabel})
+                        </td>
+                        <td className="py-2 text-center tabular-nums">{it.quantity}</td>
+                        <td className="py-2 text-right tabular-nums font-semibold">
+                          {formatTaka(it.lineTotalBdt)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="space-y-1 text-right tabular-nums">
+                <p className="text-gray-500">
+                  Subtotal: {formatTaka(inspectOrder.subtotalBdt)}
+                </p>
+                {inspectOrder.discountBdt > 0 && (
+                  <p className="text-[#0f7b3f]">
+                    Discount ({inspectOrder.couponCode}): -{formatTaka(inspectOrder.discountBdt)}
+                  </p>
+                )}
+                <p className="text-gray-500">
+                  Delivery Fee: {formatTaka(inspectOrder.deliveryFeeBdt)}
+                </p>
+                <p className="text-base font-bold text-gray-900 pt-1">
+                  Total ({inspectOrder.paymentMethod.toUpperCase()} ·{" "}
+                  {inspectOrder.paymentStatus}): {formatTaka(inspectOrder.totalBdt)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT PRODUCT & MULTI-VARIANT MODAL */}
       {editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
           <form
@@ -1778,10 +2243,22 @@ export function AdminConsole() {
               </div>
             </div>
 
-            {/* Edit Variant */}
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-3 text-xs">
-              <p className="font-bold text-gray-900">Edit Pack Variant Price & Stock</p>
-              <div className="grid gap-2 sm:grid-cols-4">
+              <div className="flex items-center justify-between">
+                <p className="font-bold text-gray-900">Edit Pack Variant</p>
+                {editingProduct.variants.length > 1 && editProdForm.variantId > 0 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleDeleteVariant(editingProduct.id, editProdForm.variantId)
+                    }
+                    className="text-red-600 font-semibold hover:underline cursor-pointer"
+                  >
+                    Remove Selected Variant
+                  </button>
+                )}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-5">
                 <select
                   value={editProdForm.variantId}
                   onChange={(e) => {
@@ -1791,6 +2268,7 @@ export function AdminConsole() {
                       setEditProdForm({
                         ...editProdForm,
                         variantId: found.id,
+                        variantLabel: found.label,
                         priceBdt: found.priceBdt,
                         compareAtBdt: found.compareAtBdt
                           ? String(found.compareAtBdt)
@@ -1807,6 +2285,14 @@ export function AdminConsole() {
                     </option>
                   ))}
                 </select>
+                <input
+                  value={editProdForm.variantLabel}
+                  onChange={(e) =>
+                    setEditProdForm({ ...editProdForm, variantLabel: e.target.value })
+                  }
+                  placeholder="Label"
+                  className="rounded-lg border border-gray-200 bg-white px-2.5 py-2"
+                />
                 <input
                   type="number"
                   value={editProdForm.priceBdt}
@@ -1825,7 +2311,7 @@ export function AdminConsole() {
                   onChange={(e) =>
                     setEditProdForm({ ...editProdForm, compareAtBdt: e.target.value })
                   }
-                  placeholder="MRP ৳ (optional)"
+                  placeholder="MRP ৳"
                   className="rounded-lg border border-gray-200 bg-white px-2.5 py-2"
                 />
                 <input

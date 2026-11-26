@@ -257,6 +257,35 @@ export const subscriptions = pgTable("subscriptions", {
 });
 
 // ==========================================
+// 5. Live Customer Support Chat Tables
+// ==========================================
+export const chatConversations = pgTable("chat_conversations", {
+  id: serial("id").primaryKey(),
+  sessionKey: text("session_key").notNull().unique(),
+  userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+  customerName: text("customer_name").notNull().default("Guest Customer"),
+  customerPhone: text("customer_phone"),
+  customerArea: text("customer_area").notNull().default("Dhaka"),
+  status: text("status").notNull().default("open"), // 'open' | 'resolved'
+  unreadForAdmin: integer("unread_for_admin").notNull().default(0),
+  unreadForCustomer: integer("unread_for_customer").notNull().default(0),
+  lastMessageText: text("last_message_text"),
+  lastMessageAt: timestamp("last_message_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id")
+    .notNull()
+    .references(() => chatConversations.id, { onDelete: "cascade" }),
+  senderRole: text("sender_role").notNull().default("customer"), // 'customer' | 'admin'
+  senderName: text("sender_name").notNull(),
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// ==========================================
 // Drizzle Relations
 // ==========================================
 export const categoryRelations = relations(categories, ({ many }) => ({
@@ -306,5 +335,20 @@ export const reviewRelations = relations(reviews, ({ one }) => ({
   product: one(products, {
     fields: [reviews.productId],
     references: [products.id],
+  }),
+}));
+
+export const chatConversationRelations = relations(chatConversations, ({ one, many }) => ({
+  user: one(user, {
+    fields: [chatConversations.userId],
+    references: [user.id],
+  }),
+  messages: many(chatMessages),
+}));
+
+export const chatMessageRelations = relations(chatMessages, ({ one }) => ({
+  conversation: one(chatConversations, {
+    fields: [chatMessages.conversationId],
+    references: [chatConversations.id],
   }),
 }));

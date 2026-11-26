@@ -12,12 +12,30 @@ import {
   Plus,
   Trash2,
   LayoutDashboard,
+  User,
+  RotateCcw,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { authClient } from "@/lib/auth-client";
-import { useApp } from "@/components/Providers";
+import { DHAKA_AREAS, useApp } from "@/components/Providers";
+import { DashboardSkeleton } from "@/components/Skeletons";
 import { formatTaka } from "@/lib/utils";
+
+interface AccountOrderItem {
+  id: number;
+  productId: number | null;
+  variantId: number | null;
+  productNameEn: string;
+  productNameBn: string;
+  variantLabel: string;
+  visualKey: string;
+  unitPriceBdt: number;
+  quantity: number;
+  slug?: string;
+  imageUrl?: string | null;
+  stockQty?: number;
+}
 
 interface AccountPayload {
   user: {
@@ -35,12 +53,8 @@ interface AccountPayload {
     totalBdt: number;
     deliveryDate: string;
     slotLabel: string;
-    items: Array<{
-      id: number;
-      productNameEn: string;
-      variantLabel: string;
-      quantity: number;
-    }>;
+    deliveryArea: string;
+    items: AccountOrderItem[];
   }>;
   addresses: Array<{
     id: number;
@@ -61,11 +75,20 @@ interface AccountPayload {
 }
 
 export default function AccountPage() {
-  const { lang, showToast } = useApp();
+  const { lang, addItem, setIsCartOpen, showToast } = useApp();
   const router = useRouter();
   const [data, setData] = useState<AccountPayload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<"overview" | "orders" | "subscriptions" | "addresses">(
+    "overview"
+  );
 
+  // Profile edit
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Address form
   const [label, setLabel] = useState("Home");
   const [area, setArea] = useState("Dhanmondi");
   const [fullAddress, setFullAddress] = useState("");
@@ -79,7 +102,10 @@ export default function AccountPage() {
         return;
       }
       if (res.ok) {
-        setData(await res.json());
+        const json: AccountPayload = await res.json();
+        setData(json);
+        setEditName(json.user.name);
+        setEditPhone(json.user.phone || "");
       }
     } finally {
       setLoading(false);
@@ -90,6 +116,24 @@ export default function AccountPage() {
     void loadAccount();
   }, [loadAccount]);
 
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    try {
+      const res = await fetch("/api/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName, phone: editPhone }),
+      });
+      if (res.ok) {
+        showToast("Profile updated");
+        loadAccount();
+      }
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   const handleActivateClub = async () => {
     const res = await fetch("/api/account", {
       method: "PATCH",
@@ -99,6 +143,35 @@ export default function AccountPage() {
     if (res.ok) {
       showToast("Sobji Club Membership activated!");
       loadAccount();
+    }
+  };
+
+  const handleReorder = (ord: AccountPayload["orders"][number]) => {
+    let added = 0;
+    for (const item of ord.items) {
+      if (!item.productId || !item.variantId) continue;
+      addItem(
+        {
+          productId: item.productId,
+          variantId: item.variantId,
+          slug: item.slug || "",
+          nameEn: item.productNameEn,
+          nameBn: item.productNameBn,
+          variantLabel: item.variantLabel,
+          priceBdt: item.unitPriceBdt,
+          visualKey: item.visualKey,
+          imageUrl: item.imageUrl,
+          maxStock: item.stockQty || 20,
+        },
+        item.quantity
+      );
+      added++;
+    }
+    if (added > 0) {
+      showToast(`${added} items from ${ord.orderCode} added to your bag!`);
+      setIsCartOpen(true);
+    } else {
+      showToast("Items from this historical order are no longer linked.", "info");
     }
   };
 
@@ -123,7 +196,7 @@ export default function AccountPage() {
     loadAccount();
   };
 
-  const handleSubStatus = async (id: number, status: "active" | "paused") => {
+  const handleSubStatus = async (id: number, status: "active" | "paused" | "cancelled") => {
     await fetch("/api/account/subscriptions", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -139,167 +212,277 @@ export default function AccountPage() {
     router.refresh();
   };
 
+  const totalSpent = data
+    ? data.orders
+        .filter((o) => o.status !== "cancelled")
+        .reduce((s, o) => s + o.totalBdt, 0)
+    : 0;
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#f9faf8]">
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
         {loading || !data ? (
-          <div className="rounded-3xl border border-[#e5e7eb] bg-white p-12 text-center text-sm text-[#6b7280]">
-            Loading your Sobji account...
-          </div>
+          <DashboardSkeleton />
         ) : (
-          <div className="space-y-8">
-            {/* Header & Membership */}
-            <div className="grid gap-6 lg:grid-cols-12">
-              <div className="flex flex-col justify-between rounded-2xl border border-[#e5e7eb] bg-white p-6 lg:col-span-7">
-                <div>
-                  <p className="tabular-nums text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0f7b3f]">
-                    Customer Profile
-                  </p>
-                  <h1 className="mt-1 text-3xl font-medium text-[#111827]">
-                    {data.user.name}
-                  </h1>
-                  <p className="text-sm text-[#6b7280]">{data.user.email}</p>
+          <div className="space-y-6">
+            {/* Header Strip */}
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-[#0f7b3f] font-bold text-lg">
+                  {data.user.name.slice(0, 1).toUpperCase()}
                 </div>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {data.user.role === "admin" && (
-                    <Link
-                      href="/admin"
-                      className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-4 py-2 text-xs font-extrabold text-[#111827]"
-                    >
-                      <LayoutDashboard className="h-3.5 w-3.5" />
-                      Open Admin Portal
-                    </Link>
-                  )}
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#d1d5db] px-4 py-2 text-xs font-bold text-[#111827] hover:bg-stone-50 cursor-pointer"
-                  >
-                    <LogOut className="h-3.5 w-3.5" />
-                    Sign Out
-                  </button>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">{data.user.name}</h1>
+                  <p className="text-xs text-gray-500">
+                    {data.user.email} {data.user.phone ? `· ${data.user.phone}` : ""}
+                  </p>
                 </div>
               </div>
-
-              <div className="rounded-2xl bg-[#0f7b3f] p-6 text-white lg:col-span-5">
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-3 py-1 text-xs font-bold text-amber-300">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Sobji Club
-                  </span>
-                  <span className="text-xs font-bold text-emerald-200">
-                    {data.user.isMember ? "ACTIVE MEMBER" : "STANDARD"}
-                  </span>
-                </div>
-                <h2 className="mt-3 text-xl font-extrabold">
-                  {data.user.isMember
-                    ? "Free Delivery & BOGO Perks Active"
-                    : "Unlock Free Delivery on ৳299+"}
-                </h2>
-                <p className="mt-1 text-xs text-emerald-100/80">
-                  {data.user.isMember
-                    ? "You enjoy priority 6:00 AM slots and member BOGO leafy greens."
-                    : "Activate complimentary Sobji Club trial or place a ৳499+ order."}
-                </p>
-                {!data.user.isMember && (
-                  <button
-                    type="button"
-                    onClick={handleActivateClub}
-                    className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-xs font-extrabold text-[#111827] hover:bg-amber-300 cursor-pointer"
+              <div className="flex flex-wrap gap-2">
+                {data.user.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-100 px-4 py-2 text-xs font-bold text-amber-900"
                   >
-                    Activate Free Trial
-                  </button>
+                    <LayoutDashboard className="h-3.5 w-3.5" />
+                    Operations Admin
+                  </Link>
                 )}
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  Sign Out
+                </button>
               </div>
             </div>
 
-            {/* Orders + Weekly Subscriptions */}
-            <div className="grid gap-6 lg:grid-cols-12">
-              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 lg:col-span-7 space-y-4">
-                <h2 className="flex items-center gap-2 text-lg font-extrabold text-[#111827]">
-                  <Package className="h-5 w-5 text-[#0f7b3f]" />
-                  <span>Your Bazar Orders ({data.orders.length})</span>
-                </h2>
+            {/* Navigation Tabs */}
+            <div className="flex overflow-x-auto pb-2 sm:flex-wrap gap-2 border-b border-gray-200">
+              {[
+                { id: "overview" as const, label: "Overview & Profile", icon: User },
+                { id: "orders" as const, label: `Orders (${data.orders.length})`, icon: Package },
+                {
+                  id: "subscriptions" as const,
+                  label: `Weekly Auto-Bazar (${data.subscriptions.length})`,
+                  icon: Repeat,
+                },
+                {
+                  id: "addresses" as const,
+                  label: `Addresses (${data.addresses.length})`,
+                  icon: MapPin,
+                },
+              ].map((t) => {
+                const Icon = t.icon;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTab(t.id)}
+                    className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition cursor-pointer ${
+                      tab === t.id
+                        ? "bg-[#0f7b3f] text-white"
+                        : "bg-white border border-gray-200 text-gray-600 hover:border-[#0f7b3f]"
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* TAB 1: OVERVIEW & PROFILE */}
+            {tab === "overview" && (
+              <div className="grid gap-6 lg:grid-cols-12">
+                <div className="space-y-6 lg:col-span-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                      <p className="text-xs text-gray-500">Total Orders</p>
+                      <p className="mt-1 tabular-nums text-2xl font-bold text-gray-900">
+                        {data.orders.length}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                      <p className="text-xs text-gray-500">Total Bazar Spend</p>
+                      <p className="mt-1 tabular-nums text-2xl font-bold text-[#0f7b3f]">
+                        {formatTaka(totalSpent, lang)}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                      <p className="text-xs text-gray-500">Saved Addresses</p>
+                      <p className="mt-1 tabular-nums text-2xl font-bold text-gray-900">
+                        {data.addresses.length}
+                      </p>
+                    </div>
+                  </div>
+
+                  <form
+                    onSubmit={handleSaveProfile}
+                    className="rounded-2xl border border-gray-200 bg-white p-6 space-y-4"
+                  >
+                    <h2 className="text-base font-bold text-gray-900">Profile Details</h2>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600">
+                          Full Name
+                        </label>
+                        <input
+                          required
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="mt-1 w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:border-[#0f7b3f] focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600">
+                          Mobile Number (BD)
+                        </label>
+                        <input
+                          value={editPhone}
+                          onChange={(e) => setEditPhone(e.target.value)}
+                          placeholder="017XX-XXXXXX"
+                          className="mt-1 w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:border-[#0f7b3f] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={savingProfile}
+                      className="rounded-xl bg-[#0f7b3f] px-5 py-2.5 text-xs font-semibold text-white hover:bg-[#0b5e30] cursor-pointer"
+                    >
+                      {savingProfile ? "Saving..." : "Save Profile"}
+                    </button>
+                  </form>
+                </div>
+
+                <div className="rounded-2xl bg-[#0f7b3f] p-6 text-white lg:col-span-5 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1 text-xs font-bold">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Sobji Club
+                      </span>
+                      <span className="text-xs font-bold text-emerald-200">
+                        {data.user.isMember ? "ACTIVE" : "STANDARD"}
+                      </span>
+                    </div>
+                    <h2 className="mt-4 text-xl font-bold">
+                      {data.user.isMember
+                        ? "Complimentary Delivery & BOGO Active"
+                        : "Unlock Free Delivery on ৳299+"}
+                    </h2>
+                    <p className="mt-2 text-xs leading-relaxed text-emerald-100">
+                      Enjoy zero delivery fees on ৳299+ orders, Buy-1-Get-1 leafy greens,
+                      and priority 6:00 AM morning crates.
+                    </p>
+                  </div>
+                  {!data.user.isMember && (
+                    <button
+                      type="button"
+                      onClick={handleActivateClub}
+                      className="mt-6 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-[#0f7b3f] hover:bg-emerald-50 cursor-pointer w-fit"
+                    >
+                      Activate Free Membership Trial
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: ORDERS & 1-CLICK REORDER */}
+            {tab === "orders" && (
+              <div className="space-y-3">
                 {data.orders.length === 0 ? (
-                  <p className="text-sm text-[#6b7280]">
-                    No orders yet.{" "}
-                    <Link href="/" className="font-bold text-[#0f7b3f] underline">
-                      Shop fresh produce
+                  <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
+                    No orders placed yet.{" "}
+                    <Link href="/" className="font-semibold text-[#0f7b3f] underline">
+                      Browse Fresh Bazar
                     </Link>
-                  </p>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
-                    {data.orders.map((ord) => (
-                      <div
-                        key={ord.id}
-                        className="rounded-2xl border border-[#e5e7eb] bg-[#f9faf8] p-4"
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div>
-                            <span className="tabular-nums text-sm font-extrabold text-[#0f7b3f]">
-                              {ord.orderCode}
-                            </span>
-                            <p className="text-xs text-[#6b7280]">
-                              {ord.deliveryDate} • {ord.slotLabel}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold uppercase text-[#0f7b3f]">
-                              {ord.status.replaceAll("_", " ")}
-                            </span>
-                            <span className="tabular-nums text-sm font-extrabold text-[#111827]">
-                              {formatTaka(ord.totalBdt, lang)}
-                            </span>
-                          </div>
+                  data.orders.map((ord) => (
+                    <div
+                      key={ord.id}
+                      className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <span className="tabular-nums text-base font-bold text-[#0f7b3f]">
+                            {ord.orderCode}
+                          </span>
+                          <p className="text-xs text-gray-500">
+                            {ord.deliveryDate} · {ord.slotLabel} · {ord.deliveryArea}
+                          </p>
                         </div>
-                        <p className="mt-2 text-xs text-[#4b5563]">
-                          {ord.items
-                            .map((i) => `${i.productNameEn} (${i.variantLabel}) ×${i.quantity}`)
-                            .join(", ")}
-                        </p>
+                        <div className="flex items-center gap-2.5">
+                          <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold uppercase text-[#0f7b3f]">
+                            {ord.status.replaceAll("_", " ")}
+                          </span>
+                          <span className="tabular-nums text-base font-bold text-gray-900">
+                            {formatTaka(ord.totalBdt, lang)}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600">
+                        {ord.items
+                          .map((i) => `${i.productNameEn} (${i.variantLabel}) ×${i.quantity}`)
+                          .join(" · ")}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => handleReorder(ord)}
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-[#0f7b3f] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#0b5e30] cursor-pointer"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                          Buy Again (Add All)
+                        </button>
                         <Link
                           href={`/track?code=${ord.orderCode}`}
-                          className="mt-2 inline-block text-xs font-bold text-[#0f7b3f] hover:underline"
+                          className="rounded-xl border border-gray-200 px-3.5 py-1.5 text-xs font-semibold text-gray-700 hover:border-[#0f7b3f]"
                         >
                           Live Track →
                         </Link>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))
                 )}
               </div>
+            )}
 
-              {/* Weekly Subscriptions & Addresses */}
-              <div className="space-y-6 lg:col-span-5">
-                <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-3">
-                  <h2 className="flex items-center gap-2 text-base font-extrabold text-[#111827]">
-                    <Repeat className="h-4 w-4 text-[#d97706]" />
-                    <span>Weekly Auto-Bazar ({data.subscriptions.length})</span>
-                  </h2>
-                  {data.subscriptions.length === 0 ? (
-                    <p className="text-xs text-[#6b7280]">
-                      Tick &ldquo;Repeat weekly&rdquo; during checkout to automate your weekly kitchen vegetables.
-                    </p>
-                  ) : (
-                    data.subscriptions.map((sub) => (
-                      <div
-                        key={sub.id}
-                        className="rounded-2xl border border-[#e5e7eb] p-3.5 text-xs space-y-2"
-                      >
-                        <div className="flex justify-between font-bold">
-                          <span>{sub.title}</span>
-                          <span className="tabular-nums text-[#0f7b3f]">
-                            {formatTaka(sub.totalBdt, lang)}
-                          </span>
+            {/* TAB 3: WEEKLY AUTO-BAZAR */}
+            {tab === "subscriptions" && (
+              <div className="grid gap-4 md:grid-cols-2">
+                {data.subscriptions.length === 0 ? (
+                  <div className="rounded-2xl border border-gray-200 bg-white p-10 text-sm text-gray-500 md:col-span-2">
+                    Tick &ldquo;Repeat this bazar weekly&rdquo; during checkout to automate weekly deliveries.
+                  </div>
+                ) : (
+                  data.subscriptions.map((sub) => (
+                    <div
+                      key={sub.id}
+                      className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-bold text-gray-900">{sub.title}</h3>
+                          <p className="text-xs text-gray-500">
+                            Next: {sub.nextDeliveryDate} · {sub.preferredSlot}
+                          </p>
                         </div>
-                        <p className="text-[#6b7280]">
-                          Next: {sub.nextDeliveryDate} • {sub.preferredSlot}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="uppercase font-bold text-[#0f7b3f]">
-                            {sub.status}
-                          </span>
+                        <span className="tabular-nums font-bold text-[#0f7b3f]">
+                          {formatTaka(sub.totalBdt, lang)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs">
+                        <span className="font-bold uppercase text-[#0f7b3f]">
+                          {sub.status}
+                        </span>
+                        <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() =>
@@ -308,87 +491,109 @@ export default function AccountPage() {
                                 sub.status === "active" ? "paused" : "active"
                               )
                             }
-                            className="rounded-full bg-[#f3f4f6] px-3 py-1 font-bold text-[#111827] cursor-pointer"
+                            className="rounded-lg border border-gray-200 px-3 py-1 font-semibold hover:border-[#0f7b3f] cursor-pointer"
                           >
                             {sub.status === "active" ? "Pause" : "Resume"}
                           </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSubStatus(sub.id, "cancelled")}
+                            className="rounded-lg border border-red-200 px-3 py-1 font-semibold text-red-600 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
                         </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* TAB 4: SAVED ADDRESSES */}
+            {tab === "addresses" && (
+              <div className="grid gap-6 lg:grid-cols-12">
+                <div className="space-y-3 lg:col-span-7">
+                  {data.addresses.length === 0 ? (
+                    <div className="rounded-2xl border border-gray-200 bg-white p-8 text-sm text-gray-500">
+                      No saved Dhaka addresses yet. Add one on the right for 1-click checkout.
+                    </div>
+                  ) : (
+                    data.addresses.map((addr) => (
+                      <div
+                        key={addr.id}
+                        className="flex items-start justify-between rounded-2xl border border-gray-200 bg-white p-4 text-sm"
+                      >
+                        <div>
+                          <p className="font-bold text-gray-900">
+                            {addr.label} · {addr.area}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-0.5">{addr.fullAddress}</p>
+                          <p className="tabular-nums text-xs text-gray-500 mt-0.5">
+                            {addr.phone}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteAddress(addr.id)}
+                          className="text-gray-400 hover:text-red-600 cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     ))
                   )}
                 </div>
 
-                {/* Saved Addresses */}
-                <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
-                  <h2 className="flex items-center gap-2 text-base font-extrabold text-[#111827]">
-                    <MapPin className="h-4 w-4 text-[#0f7b3f]" />
-                    <span>Saved Dhaka Addresses</span>
-                  </h2>
-                  {data.addresses.map((addr) => (
-                    <div
-                      key={addr.id}
-                      className="flex items-start justify-between gap-2 rounded-2xl border border-[#e5e7eb] p-3 text-xs"
-                    >
-                      <div>
-                        <p className="font-bold text-[#111827]">
-                          {addr.label} • {addr.area}
-                        </p>
-                        <p className="text-[#6b7280]">{addr.fullAddress}</p>
-                        <p className="tabular-nums text-[#6b7280]">{addr.phone}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteAddress(addr.id)}
-                        className="text-stone-400 hover:text-red-600 cursor-pointer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                  <form onSubmit={handleAddAddress} className="space-y-2 border-t border-[#e5e7eb] pt-3">
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="text"
-                        value={label}
-                        onChange={(e) => setLabel(e.target.value)}
-                        placeholder="Label (Home)"
-                        className="rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
-                      />
-                      <input
-                        type="text"
-                        value={area}
-                        onChange={(e) => setArea(e.target.value)}
-                        placeholder="Area (Dhanmondi)"
-                        className="rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
-                      />
-                    </div>
+                <form
+                  onSubmit={handleAddAddress}
+                  className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3 lg:col-span-5 h-fit"
+                >
+                  <h2 className="text-base font-bold text-gray-900">Add Dhaka Address</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <input
-                      type="text"
-                      required
-                      value={fullAddress}
-                      onChange={(e) => setFullAddress(e.target.value)}
-                      placeholder="House, Road, Flat"
-                      className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
+                      value={label}
+                      onChange={(e) => setLabel(e.target.value)}
+                      placeholder="Label (Home)"
+                      className="rounded-xl border border-gray-200 px-3 py-2 text-xs"
                     />
-                    <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="017XX-XXXXXX"
-                      className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
-                    />
-                    <button
-                      type="submit"
-                      className="inline-flex w-full items-center justify-center gap-1 rounded-full bg-[#0f7b3f] py-2 text-xs font-bold text-white cursor-pointer"
+                    <select
+                      value={area}
+                      onChange={(e) => setArea(e.target.value)}
+                      className="rounded-xl border border-gray-200 px-3 py-2 text-xs"
                     >
-                      <Plus className="h-3.5 w-3.5" />
-                      Save Address
-                    </button>
-                  </form>
-                </div>
+                      {DHAKA_AREAS.map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    required
+                    value={fullAddress}
+                    onChange={(e) => setFullAddress(e.target.value)}
+                    placeholder="House, Road, Flat"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs"
+                  />
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="017XX-XXXXXX"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex w-full items-center justify-center gap-1 rounded-xl bg-[#0f7b3f] py-2.5 text-xs font-semibold text-white cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Save Address
+                  </button>
+                </form>
               </div>
-            </div>
+            )}
           </div>
         )}
       </main>

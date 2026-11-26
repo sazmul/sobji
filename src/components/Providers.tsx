@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { Suspense, createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { Lang } from "@/lib/i18n";
+import { LiveChatWidget } from "./LiveChatWidget";
 
 export interface CartItem {
   productId: number;
@@ -25,10 +26,27 @@ interface ToastItem {
   type: "success" | "error" | "info";
 }
 
+export const DHAKA_AREAS = [
+  "Dhanmondi",
+  "Gulshan",
+  "Banani",
+  "Baridhara",
+  "Uttara",
+  "Mirpur",
+  "Mohammadpur",
+  "Bashundhara R/A",
+  "Badda",
+  "Rampura",
+  "Khilgaon",
+  "Motijheel",
+];
+
 interface AppContextValue {
   lang: Lang;
   setLang: (lang: Lang) => void;
   toggleLang: () => void;
+  deliveryArea: string;
+  setDeliveryArea: (area: string) => void;
   items: CartItem[];
   wishlistIds: number[];
   toggleWishlist: (productId: number, name?: string) => void;
@@ -48,9 +66,11 @@ const AppContext = createContext<AppContextValue | null>(null);
 const CART_STORAGE_KEY = "sobji_bazar_cart_v1";
 const LANG_STORAGE_KEY = "sobji_lang_v1";
 const WISHLIST_STORAGE_KEY = "sobji_wishlist_v1";
+const AREA_STORAGE_KEY = "sobji_area_v1";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("en");
+  const [deliveryArea, setDeliveryAreaState] = useState<string>("Dhanmondi");
   const [items, setItems] = useState<CartItem[]>([]);
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [hydrated, setHydrated] = useState(false);
@@ -63,6 +83,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
         if (savedLang === "bn" || savedLang === "en") {
           setLangState(savedLang);
+        }
+        const savedArea = localStorage.getItem(AREA_STORAGE_KEY);
+        if (savedArea && DHAKA_AREAS.includes(savedArea)) {
+          setDeliveryAreaState(savedArea);
         }
         const savedCart = localStorage.getItem(CART_STORAGE_KEY);
         if (savedCart) {
@@ -97,6 +121,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setLangState(next);
     try {
       localStorage.setItem(LANG_STORAGE_KEY, next);
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const setDeliveryArea = useCallback((area: string) => {
+    setDeliveryAreaState(area);
+    try {
+      localStorage.setItem(AREA_STORAGE_KEY, area);
     } catch {
       // Ignore
     }
@@ -188,6 +221,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
         lang,
         setLang,
         toggleLang,
+        deliveryArea,
+        setDeliveryArea,
         items,
         wishlistIds,
         toggleWishlist,
@@ -203,9 +238,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-      {/* Floating Toast Container */}
+      <Suspense fallback={null}>
+        <LiveChatWidget />
+      </Suspense>
       <div
-        className="pointer-events-none fixed bottom-20 right-4 z-[100] flex flex-col gap-2 md:bottom-6"
+        className="pointer-events-none fixed bottom-36 right-4 z-[100] flex flex-col gap-2 md:bottom-24 md:right-6"
         aria-live="polite"
       >
         {toasts.map((toast) => (
@@ -215,8 +252,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
               toast.type === "error"
                 ? "bg-red-700 text-white"
                 : toast.type === "info"
-                  ? "bg-slate-900 text-white"
-                  : "bg-[#16803c] text-white"
+                  ? "bg-gray-900 text-white"
+                  : "bg-[#0f7b3f] text-white"
             }`}
           >
             <span className="h-2 w-2 rounded-full bg-white" />

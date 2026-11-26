@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   CheckCircle2,
   Clock,
+  Copy,
   CreditCard,
   MapPin,
   Repeat,
@@ -16,7 +17,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
-import { useApp } from "./Providers";
+import { DHAKA_AREAS, useApp } from "./Providers";
 import { ProduceArtwork } from "./ProduceArtwork";
 import {
   calculateDeliveryFee,
@@ -33,23 +34,8 @@ interface DeliverySlot {
   isExpress: boolean;
 }
 
-const DHAKA_AREAS = [
-  "Dhanmondi",
-  "Gulshan",
-  "Banani",
-  "Baridhara",
-  "Uttara",
-  "Mirpur",
-  "Mohammadpur",
-  "Bashundhara R/A",
-  "Badda",
-  "Rampura",
-  "Khilgaon",
-  "Motijheel",
-];
-
 export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
-  const { lang, items, subtotal, clearCart, showToast } = useApp();
+  const { lang, items, subtotal, deliveryArea: globalArea, clearCart, showToast } = useApp();
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const isMember = Boolean(
@@ -57,10 +43,13 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
       subtotal >= FREE_DELIVERY_THRESHOLD
   );
 
+  const [savedAddresses, setSavedAddresses] = useState<
+    Array<{ id: number; label: string; area: string; fullAddress: string; phone: string }>
+  >([]);
   const [customerName, setCustomerName] = useState(session?.user?.name ?? "");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState(session?.user?.email ?? "");
-  const [deliveryArea, setDeliveryArea] = useState("Dhanmondi");
+  const [deliveryArea, setDeliveryArea] = useState(globalArea || "Dhanmondi");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [slotId, setSlotId] = useState<number>(slots[0]?.id ?? 1);
@@ -68,9 +57,21 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
   useEffect(() => {
     const t = setTimeout(() => {
       setDeliveryDate(new Date(Date.now() + 86400000).toISOString().slice(0, 10));
+      setDeliveryArea(globalArea || "Dhanmondi");
     }, 0);
     return () => clearTimeout(t);
-  }, []);
+  }, [globalArea]);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    fetch("/api/account")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (json?.addresses) setSavedAddresses(json.addresses);
+        if (json?.user?.phone && !customerPhone) setCustomerPhone(json.user.phone);
+      })
+      .catch(() => {});
+  }, [session?.user, customerPhone]);
   const [paymentMethod, setPaymentMethod] = useState<
     "cod" | "bkash" | "nagad" | "card"
   >("cod");
@@ -171,15 +172,15 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
         </p>
 
         {items.length === 0 ? (
-          <div className="mt-10 rounded-3xl border border-[#e5e7eb] bg-white p-12 text-center">
+          <div className="mt-10 rounded-2xl border border-[#e5e7eb] bg-white p-12 text-center">
             <p className="text-lg font-bold text-[#111827]">
-              Your bazar bag is currently empty
+              {lang === "bn" ? "আপনার বাজার ব্যাগ বর্তমানে খালি" : "Your bazar bag is currently empty"}
             </p>
             <Link
               href="/#catalog"
-              className="mt-4 inline-flex rounded-full bg-[#0f7b3f] px-6 py-3 text-sm font-bold text-white"
+              className="mt-4 inline-flex rounded-xl bg-[#0f7b3f] px-6 py-3 text-sm font-bold text-white"
             >
-              Browse Fresh Vegetables
+              {lang === "bn" ? "তাজা সবজি দেখুন" : "Browse Fresh Vegetables"}
             </Link>
           </div>
         ) : (
@@ -190,13 +191,32 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
             {/* Left Form */}
             <div className="space-y-6 lg:col-span-7">
               {/* Customer & Address */}
-              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
+              <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 space-y-4">
                 <h2 className="flex items-center gap-2 text-base font-bold text-[#111827]">
                   <MapPin className="h-4 w-4 text-[#0f7b3f]" />
                   <span>
                     {lang === "bn" ? "ডেলিভারি ঠিকানা" : "1. Delivery Details"}
                   </span>
                 </h2>
+                {savedAddresses.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {savedAddresses.map((addr) => (
+                      <button
+                        key={addr.id}
+                        type="button"
+                        onClick={() => {
+                          setDeliveryArea(addr.area);
+                          setDeliveryAddress(addr.fullAddress);
+                          setCustomerPhone(addr.phone);
+                          showToast(`Filled ${addr.label} (${addr.area})`, "info");
+                        }}
+                        className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-[#0f7b3f] hover:bg-emerald-100 cursor-pointer"
+                      >
+                        Use {addr.label} ({addr.area})
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="block text-xs font-bold text-[#6b7280]">
@@ -281,7 +301,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
               </div>
 
               {/* Delivery Slot */}
-              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
+              <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 className="flex items-center gap-2 text-base font-bold text-[#111827]">
                     <Clock className="h-4 w-4 text-[#d97706]" />
@@ -350,63 +370,123 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
               </div>
 
               {/* Payment Method */}
-              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
+              <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 space-y-4">
                 <h2 className="flex items-center gap-2 text-base font-bold text-[#111827]">
                   <CreditCard className="h-4 w-4 text-[#0f7b3f]" />
                   <span>
-                    {lang === "bn" ? "পেমেন্ট পদ্ধতি" : "3. Payment Method"}
+                    {lang === "bn" ? "৩. পেমেন্ট পদ্ধতি" : "3. Payment Method"}
                   </span>
                 </h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
                     {
                       id: "cod" as const,
-                      title: "Cash on Delivery",
-                      sub: "Pay rider after checking freshness",
+                      title: lang === "bn" ? "ক্যাশ অন ডেলিভারি" : "Cash on Delivery",
+                      sub: lang === "bn" ? "ডেলিভারির সময় পণ্য দেখে পেমেন্ট" : "Pay rider after checking freshness",
+                      logo: null,
                     },
                     {
                       id: "bkash" as const,
                       title: "bKash",
-                      sub: "Instant wallet checkout",
+                      sub: lang === "bn" ? "তাৎক্ষণিক বিকাশ পেমেন্ট" : "Instant wallet checkout",
+                      logo: "/images/payments/bkash.png",
                     },
                     {
                       id: "nagad" as const,
                       title: "Nagad",
-                      sub: "Zero-fee Nagad mobile pay",
+                      sub: lang === "bn" ? "নগদ মোবাইল পেমেন্ট" : "Zero-fee Nagad mobile pay",
+                      logo: "/images/payments/nagad.png",
                     },
                     {
                       id: "card" as const,
-                      title: "Card / SSLCommerz",
+                      title: lang === "bn" ? "কার্ড / SSLCommerz" : "Card / SSLCommerz",
                       sub: "Visa, Mastercard, Nexus",
+                      logo: null,
                     },
                   ].map((pm) => (
                     <button
                       key={pm.id}
                       type="button"
                       onClick={() => setPaymentMethod(pm.id)}
-                      className={`rounded-2xl border p-3.5 text-left transition cursor-pointer ${
+                      className={`rounded-xl border p-3.5 text-left transition cursor-pointer ${
                         paymentMethod === pm.id
                           ? "border-[#0f7b3f] bg-[#ecfdf5] ring-2 ring-[#0f7b3f]/20"
-                          : "border-[#e5e7eb] bg-[#f9faf8]"
+                          : "border-[#e5e7eb] bg-[#f9faf8] hover:border-gray-300"
                       }`}
                     >
-                      <p className="text-sm font-bold text-[#111827]">{pm.title}</p>
-                      <p className="text-xs text-[#6b7280]">{pm.sub}</p>
+                      <div className="flex items-center justify-between gap-2 min-h-[24px]">
+                        {pm.logo ? (
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={pm.logo}
+                              alt={pm.title}
+                              className="h-5 w-auto object-contain"
+                            />
+                          </>
+                        ) : (
+                          <p className="text-sm font-bold text-[#111827]">{pm.title}</p>
+                        )}
+                        {pm.id === "card" && (
+                          <span className="text-[11px] font-black italic text-[#1A1F71]">
+                            VISA / MC
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1.5 text-xs text-[#6b7280]">{pm.sub}</p>
                     </button>
                   ))}
                 </div>
 
                 {paymentMethod !== "cod" && (
-                  <div className="rounded-2xl bg-[#f9faf8] p-4 border border-[#e5e7eb]">
-                    <label className="block text-xs font-bold text-[#111827]">
-                      Merchant Number: 01700-762544 • Transaction ID (Optional for demo)
-                    </label>
+                  <div className="rounded-xl bg-[#f9faf8] p-4 border border-[#e5e7eb] space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs font-semibold text-[#111827]">
+                        {lang === "bn" ? "মার্চেন্ট নম্বর:" : "Merchant Wallet:"}{" "}
+                        <strong className="tabular-nums text-[#0f7b3f]">01885-592511</strong>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (navigator.clipboard?.writeText) {
+                            navigator.clipboard.writeText("01885592511");
+                            showToast(
+                              lang === "bn"
+                                ? "মার্চেন্ট নম্বর কপি হয়েছে"
+                                : "Merchant number copied",
+                              "info"
+                            );
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 hover:border-[#0f7b3f] cursor-pointer"
+                      >
+                        <Copy className="h-3 w-3" />
+                        <span>{lang === "bn" ? "কপি" : "Copy"}</span>
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-[#6b7280]">
+                      {paymentMethod === "bkash"
+                        ? lang === "bn"
+                          ? `bKash অ্যাপ থেকে 'Make Payment' সিলেক্ট করে ${formatTaka(finalTotal, lang)} পাঠিয়ে TrxID দিন (ডেমোর জন্য খালি রাখতে পারেন)।`
+                          : `Send ${formatTaka(finalTotal)} via bKash Payment and enter TrxID below (optional for demo).`
+                        : paymentMethod === "nagad"
+                          ? lang === "bn"
+                            ? `Nagad অ্যাপ থেকে Merchant Pay করে ${formatTaka(finalTotal, lang)} পাঠিয়ে TrxID দিন।`
+                            : `Pay ${formatTaka(finalTotal)} via Nagad Merchant Pay and enter TrxID below (optional for demo).`
+                          : lang === "bn"
+                            ? "SSLCommerz কার্ড/ব্যাংক গেটওয়ে রেফারেন্স লিখুন (ডেমোর জন্য ঐচ্ছিক)।"
+                            : "Enter gateway reference ID below (optional for demo)."}
+                    </p>
                     <input
                       type="text"
                       value={paymentRef}
                       onChange={(e) => setPaymentRef(e.target.value)}
-                      placeholder="e.g. BKX928174 (auto-verified if blank)"
-                      className="mt-1.5 w-full rounded-xl border border-[#d1d5db] bg-white px-3.5 py-2 text-sm focus:border-[#0b5e30] focus:outline-none"
+                      placeholder={
+                        lang === "bn"
+                          ? "যেমন: BKX928174 (খালি রাখলে অটো-ভেরিফাই)"
+                          : "e.g. BKX928174 (auto-verified if blank)"
+                      }
+                      className="w-full rounded-xl border border-[#d1d5db] bg-white px-3.5 py-2 text-sm focus:border-[#0b5e30] focus:outline-none"
                     />
                   </div>
                 )}
@@ -415,7 +495,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
 
             {/* Right Summary */}
             <div className="lg:col-span-5">
-              <div className="sticky top-24 rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-5 shadow-sm">
+              <div className="sticky top-24 rounded-2xl border border-[#e5e7eb] bg-white p-6 space-y-5 shadow-sm">
                 <h2 className="text-lg font-extrabold text-[#111827]">
                   Order Summary ({items.length})
                 </h2>
@@ -478,6 +558,18 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       {appliedCoupon.code}: {appliedCoupon.descriptionEn}
                     </p>
                   )}
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {["SOBJI10", "FRESH50", "MORNING15"].map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setCouponInput(c)}
+                        className="rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] font-semibold text-gray-600 hover:border-[#0f7b3f] hover:text-[#0f7b3f] cursor-pointer"
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Totals */}
@@ -525,9 +617,15 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                 <button
                   type="submit"
                   disabled={placing}
-                  className="w-full rounded-full bg-[#0f7b3f] py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#0b5e30] disabled:opacity-60 transition cursor-pointer"
+                  className="w-full rounded-xl bg-[#0f7b3f] py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#0b5e30] disabled:opacity-60 transition cursor-pointer"
                 >
-                  {placing ? "Confirming Order..." : "Confirm Bazar Order"}
+                  {placing
+                    ? lang === "bn"
+                      ? "অর্ডার কনফার্ম হচ্ছে..."
+                      : "Confirming Order..."
+                    : lang === "bn"
+                      ? "বাজার অর্ডার কনফার্ম করুন"
+                      : "Confirm Bazar Order"}
                 </button>
 
                 <p className="flex items-center justify-center gap-1.5 text-[11px] text-[#6b7280]">

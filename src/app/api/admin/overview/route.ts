@@ -3,6 +3,7 @@ import { asc, desc } from "drizzle-orm";
 import { getDb } from "@/db";
 import {
   categories,
+  chatConversations,
   coupons,
   deliverySlots,
   farmers,
@@ -10,6 +11,7 @@ import {
   orders,
   products,
   productVariants,
+  reviews,
   user,
 } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
@@ -32,6 +34,8 @@ export async function GET() {
       allCoupons,
       allSlots,
       allUsers,
+      allReviews,
+      allChatConvs,
     ] = await Promise.all([
       db.select().from(orders).orderBy(desc(orders.createdAt)),
       db.select().from(orderItems),
@@ -53,6 +57,14 @@ export async function GET() {
         })
         .from(user)
         .orderBy(desc(user.createdAt)),
+      db.select().from(reviews).orderBy(desc(reviews.createdAt)),
+      db
+        .select({
+          id: chatConversations.id,
+          unreadForAdmin: chatConversations.unreadForAdmin,
+          status: chatConversations.status,
+        })
+        .from(chatConversations),
     ]);
 
     const itemMap = new Map<number, typeof allOrderItems>();
@@ -83,27 +95,88 @@ export async function GET() {
       catOrderCount.set(p.categoryId, (catOrderCount.get(p.categoryId) ?? 0) + 1);
     }
 
+    // 7-day daily revenue & order count series
+    const today = new Date();
+    const dailyMap = new Map<string, { date: string; label: string; revenueBdt: number; orders: number }>();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today.getTime() - i * 86400000);
+      const iso = d.toISOString().slice(0, 10);
+      const label = d.toLocaleDateString("en-US", { weekday: "short" });
+      dailyMap.set(iso, { date: iso, label, revenueBdt: 0, orders: 0 });
+    }
+    for (const ord of allOrders) {
+      if (ord.status === "cancelled") continue;
+      const iso = new Date(ord.createdAt).toISOString().slice(0, 10);
+      const bucket = dailyMap.get(iso);
+      if (bucket) {
+        bucket.revenueBdt += ord.totalBdt;
+        bucket.orders += 1;
+      }
+    }
+
+    // Top selling products
+    const salesByProduct = new Map<
+      string,
+      { nameEn: string; units: number; revenueBdt: number }
+    >();
+    const cancelledOrderIds = new Set(
+      allOrders.filter((o) => o.status === "cancelled").map((o) => o.id)
+    );
+    for (const item of allOrderItems) {
+      if (cancelledOrderIds.has(item.orderId)) continue;
+      const cur = salesByProduct.get(item.productNameEn) ?? {
+        nameEn: item.productNameEn,
+        units: 0,
+        revenueBdt: 0,
+      };
+      cur.units += item.quantity;
+      cur.revenueBdt += item.lineTotalBdt;
+      salesByProduct.set(item.productNameEn, cur);
+    }
+    const topProducts = [...salesByProduct.values()]
+      .sort((a, b) => b.revenueBdt - a.revenueBdt)
+      .slice(0, 5);
+
+    // Status breakdown
+    const statusCounts: Record<string, number> = {};
+    for (const o of allOrders) {
+      statusCounts[o.status] = (statusCounts[o.status] ?? 0) + 1;
+    }
+
     const totalRevenueBdt = allOrders
       .filter((o) => o.status !== "cancelled")
       .reduce((sum, o) => sum + o.totalBdt, 0);
 
-    const lowStockCount = allVariants.filter((v) => v.stockQty <= 15).length;
-    const pendingOrdersCount = allOrders.filter(
-      (o) => !["delivered", "cancelled"].includes(o.status)
-    ).length;
+    const avgOrderValueBdt =
+      allOrders.filter((o) => o.status !== "cancelled").length > 0
+        ? Math.round(
+            totalRevenueBdt /
+              allOrders.filter((o) => o.status !== "cancelled").length
+          )
+        : 0;
+
+    const prodNameMap = new Map(allProducts.map((p) => [p.id, p.nameEn]));
 
     return NextResponse.json({
       currentAdminId: admin.id,
       stats: {
         totalRevenueBdt,
+        avgOrderValueBdt,
         totalOrders: allOrders.length,
-        pendingOrdersCount,
+        pendingOrdersCount: allOrders.filter(
+          (o) => !["delivered", "cancelled"].includes(o.status)
+        ).length,
         activeProducts: allProducts.filter((p) => p.isActive).length,
         totalCategories: allCats.length,
         totalCustomers: allUsers.length,
         clubMembers: allUsers.filter((u) => u.isMember).length,
-        lowStockCount,
+        lowStockCount: allVariants.filter((v) => v.stockQty <= 15).length,
+        unreadChatsCount: allChatConvs.reduce((sum, c) => sum + (c.unreadForAdmin || 0), 0),
+        openChatsCount: allChatConvs.filter((c) => c.status === "open").length,
       },
+      dailySeries: [...dailyMap.values()],
+      topProducts,
+      statusCounts,
       orders: allOrders.map((o) => ({
         ...o,
         items: itemMap.get(o.id) ?? [],
@@ -123,6 +196,10 @@ export async function GET() {
         ...u,
         orderCount: userStatsMap.get(u.id)?.orderCount ?? 0,
         totalSpentBdt: userStatsMap.get(u.id)?.totalSpentBdt ?? 0,
+      })),
+      reviews: allReviews.map((r) => ({
+        ...r,
+        productNameEn: prodNameMap.get(r.productId) ?? "Product",
       })),
     });
   } catch (err) {

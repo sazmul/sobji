@@ -8,6 +8,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { authClient } from "@/lib/auth-client";
 import { useApp } from "@/components/Providers";
+import { CardRowSkeleton } from "@/components/Skeletons";
 
 function SignInInner() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -19,7 +20,7 @@ function SignInInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/account";
-  const { showToast } = useApp();
+  const { lang, showToast } = useApp();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,40 +83,50 @@ function SignInInner() {
       <div className="rounded-2xl border border-[#e5e7eb] bg-white p-7 sm:p-9">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0f7b3f]">
           <Leaf className="h-3.5 w-3.5" />
-          <span>sobji.com Account</span>
+          <span>{lang === "bn" ? "sobji.com অ্যাকাউন্ট" : "sobji.com Account"}</span>
         </div>
-        <h1 className="mt-2 text-2xl font-medium text-[#111827] sm:text-3xl">
-          {mode === "signin" ? "Sign in to your Bazar" : "Create your Sobji Account"}
+        <h1 className="mt-2 text-2xl font-semibold text-[#111827] sm:text-3xl">
+          {mode === "signin"
+            ? lang === "bn"
+              ? "আপনার বাজারে সাইন ইন করুন"
+              : "Sign in to your Bazar"
+            : lang === "bn"
+              ? "নতুন সবজি অ্যাকাউন্ট খুলুন"
+              : "Create your Sobji Account"}
         </h1>
         <p className="mt-1 text-xs text-[#6b7280]">
-          Manage orders, Sobji Club free delivery, addresses & weekly schedules.
+          {lang === "bn"
+            ? "অর্ডার, সবজি ক্লাব ফ্রি ডেলিভারি, ঠিকানা ও সাপ্তাহিক বাজার পরিচালনা করুন।"
+            : "Manage orders, Sobji Club free delivery, addresses & weekly schedules."}
         </p>
 
-        <div className="mt-5 grid grid-cols-2 rounded-full bg-[#f3f4f6] p-1 text-xs font-bold">
+        <div className="mt-5 grid grid-cols-2 rounded-xl bg-[#f3f4f6] p-1 text-xs font-bold">
           <button
             type="button"
             onClick={() => setMode("signin")}
-            className={`rounded-full py-2 transition cursor-pointer ${
+            className={`rounded-lg py-2 transition cursor-pointer ${
               mode === "signin" ? "bg-white text-[#0f7b3f] shadow-2xs" : "text-[#6b7280]"
             }`}
           >
-            Sign In
+            {lang === "bn" ? "সাইন ইন" : "Sign In"}
           </button>
           <button
             type="button"
             onClick={() => setMode("signup")}
-            className={`rounded-full py-2 transition cursor-pointer ${
+            className={`rounded-lg py-2 transition cursor-pointer ${
               mode === "signup" ? "bg-white text-[#0f7b3f] shadow-2xs" : "text-[#6b7280]"
             }`}
           >
-            Sign Up
+            {lang === "bn" ? "নতুন অ্যাকাউন্ট" : "Sign Up"}
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {mode === "signup" && (
             <div>
-              <label className="block text-xs font-bold text-[#6b7280]">Full Name</label>
+              <label className="block text-xs font-bold text-[#6b7280]">
+                {lang === "bn" ? "পূর্ণ নাম" : "Full Name"}
+              </label>
               <div className="relative mt-1">
                 <User className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#7c8c82]" />
                 <input
@@ -123,7 +134,7 @@ function SignInInner() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your full name"
+                  placeholder={lang === "bn" ? "আপনার নাম লিখুন" : "Your full name"}
                   className="w-full rounded-xl border border-[#d1d5db] py-2.5 pl-10 pr-3 text-sm focus:border-[#0b5e30] focus:outline-none"
                 />
               </div>
@@ -131,7 +142,9 @@ function SignInInner() {
           )}
 
           <div>
-            <label className="block text-xs font-bold text-[#6b7280]">Email Address</label>
+            <label className="block text-xs font-bold text-[#6b7280]">
+              {lang === "bn" ? "ইমেইল ঠিকানা" : "Email Address"}
+            </label>
             <div className="relative mt-1">
               <Mail className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#7c8c82]" />
               <input
@@ -146,7 +159,9 @@ function SignInInner() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#6b7280]">Password</label>
+            <label className="block text-xs font-bold text-[#6b7280]">
+              {lang === "bn" ? "পাসওয়ার্ড" : "Password"}
+            </label>
             <div className="relative mt-1">
               <Lock className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#7c8c82]" />
               <input
@@ -170,14 +185,20 @@ function SignInInner() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0f7b3f] py-3 text-sm font-bold text-white hover:bg-[#0b5e30] disabled:opacity-60 transition cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0f7b3f] py-3 text-sm font-bold text-white hover:bg-[#0b5e30] disabled:opacity-60 transition cursor-pointer"
           >
             <span>
               {loading
-                ? "Please wait..."
+                ? lang === "bn"
+                  ? "অপেক্ষা করুন..."
+                  : "Please wait..."
                 : mode === "signin"
-                  ? "Sign In"
-                  : "Create Account"}
+                  ? lang === "bn"
+                    ? "সাইন ইন করুন"
+                    : "Sign In"
+                  : lang === "bn"
+                    ? "অ্যাকাউন্ট তৈরি করুন"
+                    : "Create Account"}
             </span>
             <ArrowRight className="h-4 w-4" />
           </button>
@@ -186,7 +207,7 @@ function SignInInner() {
         {/* Demo Quick Access */}
         <div className="mt-6 border-t border-[#e5e7eb] pt-5 space-y-2">
           <p className="text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-            Instant Demo Access
+            {lang === "bn" ? "তাৎক্ষণিক ডেমো লগইন" : "Instant Demo Access"}
           </p>
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -196,7 +217,7 @@ function SignInInner() {
               }
               className="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 text-xs font-bold text-[#0f7b3f] hover:bg-emerald-100 cursor-pointer"
             >
-              Demo Customer
+              {lang === "bn" ? "ডেমো কাস্টমার" : "Demo Customer"}
             </button>
             <button
               type="button"
@@ -206,13 +227,13 @@ function SignInInner() {
               className="inline-flex items-center justify-center gap-1 rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 cursor-pointer"
             >
               <Shield className="h-3.5 w-3.5" />
-              Demo Admin
+              {lang === "bn" ? "ডেমো অ্যাডমিন" : "Demo Admin"}
             </button>
           </div>
           <p className="text-center text-[11px] text-[#6b7280] pt-1">
-            Or continue shopping as guest and{" "}
+            {lang === "bn" ? "অথবা গেস্ট হিসেবে " : "Or continue shopping as guest and "}
             <Link href="/checkout" className="font-bold text-[#0f7b3f] underline">
-              checkout directly
+              {lang === "bn" ? "সরাসরি চেকআউট করুন" : "checkout directly"}
             </Link>
             .
           </p>
@@ -227,7 +248,13 @@ export default function SignInPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1">
-        <Suspense fallback={<div className="p-12 text-center text-sm">Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="mx-auto max-w-md px-4 py-12">
+              <CardRowSkeleton rows={2} />
+            </div>
+          }
+        >
           <SignInInner />
         </Suspense>
       </main>

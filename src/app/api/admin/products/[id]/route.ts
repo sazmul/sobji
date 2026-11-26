@@ -27,6 +27,7 @@ const patchSchema = z.object({
   priceBdt: z.number().int().positive().optional(),
   compareAtBdt: z.number().int().positive().nullable().optional(),
   stockQty: z.number().int().min(0).optional(),
+  deleteVariantId: z.number().int().positive().optional(),
   newVariant: z
     .object({
       label: z.string().min(1).max(40),
@@ -97,6 +98,12 @@ export async function PATCH(
           .set(varUpdates)
           .where(eq(productVariants.id, d.variantId));
       }
+    }
+
+    if (d.deleteVariantId) {
+      await db
+        .delete(productVariants)
+        .where(eq(productVariants.id, d.deleteVariantId));
     }
 
     if (d.newVariant) {
