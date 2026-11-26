@@ -3,7 +3,7 @@
 import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Leaf, Lock, Mail, User, ArrowRight, Shield } from "lucide-react";
+import { Leaf, Lock, Mail, User, ArrowRight } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { authClient } from "@/lib/auth-client";
@@ -53,26 +53,6 @@ function SignInInner() {
         router.push(redirect);
         router.refresh();
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const quickLogin = async (demoEmail: string, demoPass: string, target: string) => {
-    setError("");
-    setLoading(true);
-    try {
-      const res = await authClient.signIn.email({
-        email: demoEmail,
-        password: demoPass,
-      });
-      if (res.error) {
-        setError(res.error.message || "Demo sign in failed");
-        return;
-      }
-      showToast("Signed in!");
-      router.push(target);
-      router.refresh();
     } finally {
       setLoading(false);
     }
@@ -204,33 +184,8 @@ function SignInInner() {
           </button>
         </form>
 
-        {/* Demo Quick Access */}
-        <div className="mt-6 border-t border-[#e5e7eb] pt-5 space-y-2">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-            {lang === "bn" ? "তাৎক্ষণিক ডেমো লগইন" : "Instant Demo Access"}
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() =>
-                quickLogin("customer@sobji.com", "SobjiUser2026!", "/account")
-              }
-              className="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 text-xs font-bold text-[#0f7b3f] hover:bg-emerald-100 cursor-pointer"
-            >
-              {lang === "bn" ? "ডেমো কাস্টমার" : "Demo Customer"}
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                quickLogin("admin@sobji.com", "SobjiAdmin2026!", "/admin")
-              }
-              className="inline-flex items-center justify-center gap-1 rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 cursor-pointer"
-            >
-              <Shield className="h-3.5 w-3.5" />
-              {lang === "bn" ? "ডেমো অ্যাডমিন" : "Demo Admin"}
-            </button>
-          </div>
-          <p className="text-center text-[11px] text-[#6b7280] pt-1">
+        <div className="mt-6 border-t border-[#e5e7eb] pt-4">
+          <p className="text-center text-[11px] text-[#6b7280]">
             {lang === "bn" ? "অথবা গেস্ট হিসেবে " : "Or continue shopping as guest and "}
             <Link href="/checkout" className="font-bold text-[#0f7b3f] underline">
               {lang === "bn" ? "সরাসরি চেকআউট করুন" : "checkout directly"}
