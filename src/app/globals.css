@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f3;
+  --foreground: #111c16;
+  --surface: #ffffff;
+  --surface-warm: #f3efe6;
+  --surface-sage: #ecfdf5;
+  --primary: #14532d;
+  --primary-hover: #166534;
+  --primary-light: #22c55e;
+  --accent: #d97706;
+  --accent-warm: #ea580c;
+  --muted: #526559;
+  --border: #e4e0d5;
+  --ring: #166534;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-warm: var(--surface-warm);
+  --color-surface-sage: var(--surface-sage);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-accent: var(--accent);
+  --color-accent-warm: var(--accent-warm);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --font-sans: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
+  --font-bangla: var(--font-hind), var(--font-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom subtle organic scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3efe6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c5cbbd;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #166534;
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 5s ease-in-out infinite;
+}
