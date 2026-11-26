@@ -30,6 +30,8 @@ interface AppContextValue {
   setLang: (lang: Lang) => void;
   toggleLang: () => void;
   items: CartItem[];
+  wishlistIds: number[];
+  toggleWishlist: (productId: number, name?: string) => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
   addItem: (item: Omit<CartItem, "quantity">, qty?: number) => void;
@@ -45,10 +47,12 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 const CART_STORAGE_KEY = "sobji_bazar_cart_v1";
 const LANG_STORAGE_KEY = "sobji_lang_v1";
+const WISHLIST_STORAGE_KEY = "sobji_wishlist_v1";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("en");
   const [items, setItems] = useState<CartItem[]>([]);
+  const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -65,6 +69,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(savedCart);
           if (Array.isArray(parsed)) setItems(parsed);
         }
+        const savedWish = localStorage.getItem(WISHLIST_STORAGE_KEY);
+        if (savedWish) {
+          const parsedWish = JSON.parse(savedWish);
+          if (Array.isArray(parsedWish)) setWishlistIds(parsedWish);
+        }
       } catch {
         // Ignore storage errors
       } finally {
@@ -78,10 +87,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     if (!hydrated) return;
     try {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistIds));
     } catch {
       // Ignore storage errors
     }
-  }, [items, hydrated]);
+  }, [items, wishlistIds, hydrated]);
 
   const setLang = useCallback((next: Lang) => {
     setLangState(next);
@@ -107,6 +117,25 @@ export function Providers({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const toggleWishlist = useCallback(
+    (productId: number, name?: string) => {
+      setWishlistIds((prev) => {
+        const exists = prev.includes(productId);
+        const next = exists
+          ? prev.filter((id) => id !== productId)
+          : [...prev, productId];
+        showToast(
+          exists
+            ? `${name || "Item"} removed from wishlist`
+            : `${name || "Item"} saved to wishlist`,
+          "info"
+        );
+        return next;
+      });
+    },
+    [showToast]
+  );
+
   const addItem = useCallback(
     (newItem: Omit<CartItem, "quantity">, qty = 1) => {
       setItems((prev) => {
@@ -121,8 +150,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       });
       showToast(
         lang === "bn"
-          ? `${newItem.nameBn} (${newItem.variantLabel}) ব্যাগে যোগ হয়েছে`
-          : `${newItem.nameEn} (${newItem.variantLabel}) added to bazar bag`
+          ? `${newItem.nameBn} (${newItem.variantLabel}) কার্টে যোগ হয়েছে`
+          : `${newItem.nameEn} (${newItem.variantLabel}) added to cart`
       );
     },
     [lang, showToast]
@@ -160,6 +189,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
         setLang,
         toggleLang,
         items,
+        wishlistIds,
+        toggleWishlist,
         isCartOpen,
         setIsCartOpen,
         addItem,
@@ -180,15 +211,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center gap-2.5 rounded-2xl px-4 py-3 text-sm font-medium shadow-lg ring-1 backdrop-blur-md transition-all ${
+            className={`pointer-events-auto flex items-center gap-2.5 rounded-xl px-4 py-3 text-xs font-semibold shadow-lg backdrop-blur-md transition-all ${
               toast.type === "error"
-                ? "bg-red-950/95 text-red-50 ring-red-700/40"
+                ? "bg-red-700 text-white"
                 : toast.type === "info"
-                  ? "bg-amber-950/95 text-amber-50 ring-amber-700/40"
-                  : "bg-[#14532d]/95 text-white ring-emerald-500/30"
+                  ? "bg-slate-900 text-white"
+                  : "bg-[#16803c] text-white"
             }`}
           >
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="h-2 w-2 rounded-full bg-white" />
             {toast.message}
           </div>
         ))}

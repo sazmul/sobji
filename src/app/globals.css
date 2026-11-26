@@ -1,31 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbf9f5;
-  --foreground: #112218;
+  --background: #ffffff;
+  --foreground: #18231c;
   --surface: #ffffff;
-  --surface-stone: #f5f3ee;
-  --surface-tint: #eef2ec;
-  --primary: #143624;
-  --primary-hover: #1d4a32;
-  --accent: #a14a18;
-  --muted: #5b695f;
-  --border: #e7e2d8;
-  --border-strong: #d5cfc2;
+  --surface-soft: #f6f8f6;
+  --surface-mint: #eef9f1;
+  --primary: #16803c;
+  --primary-hover: #126a31;
+  --accent: #f97316;
+  --muted: #5f6f64;
+  --border: #e4eae5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
-  --color-surface-stone: var(--surface-stone);
-  --color-surface-tint: var(--surface-tint);
+  --color-surface-soft: var(--surface-soft);
+  --color-surface-mint: var(--surface-mint);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-border: var(--border);
-  --font-serif: var(--font-newsreader), Georgia, serif;
   --font-sans: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
   --font-bangla: var(--font-hind), var(--font-jakarta), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), monospace;
@@ -40,28 +38,27 @@ body {
   color: var(--foreground);
   font-family: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .font-display {
-  font-family: var(--font-newsreader), var(--font-hind), Georgia, serif;
-  letter-spacing: -0.025em;
+  font-family: var(--font-jakarta), var(--font-hind), system-ui, sans-serif;
+  letter-spacing: -0.02em;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f3ee;
+  background: #f3f6f4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ccc5b7;
-  border-radius: 3px;
+  background: #c7d3ca;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #143624;
+  background: #16803c;
 }
