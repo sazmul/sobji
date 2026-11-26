@@ -11,15 +11,15 @@ export function Footer() {
   const { lang } = useApp();
 
   return (
-    <footer className="border-t border-[#e5e7eb] bg-[#1f2922] text-neutral-200">
-      <div className="mx-auto max-w-[1360px] px-4 py-10 sm:px-6">
+    <footer className="border-t border-gray-200 bg-[#111827] text-gray-300">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <SobjiLogo light />
-            <p className="text-xs leading-relaxed text-emerald-100/80">
+            <p className="text-xs leading-relaxed text-gray-400">
               {t(lang, "footerTagline")}
             </p>
-            <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold">
+            <div className="flex flex-wrap gap-1.5 text-[11px] font-medium text-gray-200">
               <span className="rounded bg-white/10 px-2.5 py-1">bKash</span>
               <span className="rounded bg-white/10 px-2.5 py-1">Nagad</span>
               <span className="rounded bg-white/10 px-2.5 py-1">SSLCommerz</span>
@@ -28,10 +28,10 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-emerald-300">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white">
               {lang === "bn" ? "কুইক লিংক" : "Categories & Links"}
             </h3>
-            <ul className="mt-4 space-y-2 text-xs text-emerald-100/85">
+            <ul className="mt-4 space-y-2.5 text-xs text-gray-400">
               <li>
                 <Link href="/#flash-deals" className="hover:text-white transition">
                   Weekly Discounts
@@ -54,54 +54,53 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/account" className="hover:text-white transition">
-                  Sobji Club Membership
+                  Sobji Membership
                 </Link>
               </li>
             </ul>
           </div>
 
           <div id="areas">
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-emerald-300">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white">
               {lang === "bn" ? "ডেলিভারি এলাকা" : "Dhaka Available Areas"}
             </h3>
-            <p className="mt-4 text-xs leading-relaxed text-emerald-100/80">
+            <p className="mt-4 text-xs leading-relaxed text-gray-400">
               Dhanmondi, Gulshan, Banani, Baridhara, Uttara, Mirpur, Mohammadpur,
               Bashundhara R/A, Badda, Rampura, Khilgaon & Motijheel.
             </p>
-            <p className="mt-3 text-xs text-amber-300 font-semibold">
-              Promo Codes: <span className="font-mono">SOBJI10</span> ·{" "}
-              <span className="font-mono">FRESH50</span>
+            <p className="mt-3 text-xs text-emerald-400 font-medium">
+              Promo Codes: SOBJI10 · FRESH50
             </p>
           </div>
 
-          <div className="space-y-2.5 text-xs text-emerald-100/85">
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-emerald-300">
+          <div className="space-y-2.5 text-xs text-gray-400">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white">
               {lang === "bn" ? "২৪/৭ সাপোর্ট" : "Customer Care"}
             </h3>
             <p className="flex items-center gap-2 pt-1">
-              <Phone className="h-3.5 w-3.5 text-emerald-300" />
+              <Phone className="h-3.5 w-3.5 text-emerald-400" />
               <span>Hotline: +880 1700-762544</span>
             </p>
             <p className="flex items-center gap-2">
-              <MessageCircle className="h-3.5 w-3.5 text-emerald-300" />
+              <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
               <span>WhatsApp Order: 01700-762544</span>
             </p>
             <p className="flex items-center gap-2">
-              <Mail className="h-3.5 w-3.5 text-emerald-300" />
+              <Mail className="h-3.5 w-3.5 text-emerald-400" />
               <span>care@sobji.com</span>
             </p>
             <p className="flex items-center gap-2">
-              <MapPin className="h-3.5 w-3.5 text-emerald-300" />
+              <MapPin className="h-3.5 w-3.5 text-emerald-400" />
               <span>Kawran Bazar Hub, Dhaka 1215</span>
             </p>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-emerald-200/70 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-gray-400 sm:flex-row">
           <p>© 2026 sobji.com — Straight From The Field, Bangladesh.</p>
           <p>
             Demo Order Code:{" "}
-            <Link href="/track?code=SBJ-DEMO01" className="font-mono text-amber-300 underline">
+            <Link href="/track?code=SBJ-DEMO01" className="text-emerald-400 underline font-medium">
               SBJ-DEMO01
             </Link>
           </p>

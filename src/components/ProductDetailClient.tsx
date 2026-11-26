@@ -140,7 +140,7 @@ export function ProductDetailClient({
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14532d] hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0f7b3f] hover:underline"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>{lang === "bn" ? "সব বাজারে ফিরে যান" : "Back to Fresh Bazar"}</span>
@@ -149,15 +149,15 @@ export function ProductDetailClient({
         <div className="mt-6 grid gap-8 lg:grid-cols-12">
           {/* Left Visual */}
           <div className="lg:col-span-5">
-            <div className="relative aspect-square overflow-hidden rounded-2xl border border-[#e7e2d8] bg-[#f5f3ee]">
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-[#e5e7eb] bg-[#f3f4f6]">
               <ProduceArtwork
                 visualKey={product.visualKey}
                 imageUrl={product.imageUrl}
                 alt={product.nameEn}
               />
               <div className="absolute left-4 top-4 flex gap-2">
-                <span className="inline-flex items-center gap-1 rounded bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#143624] border border-[#e7e2d8]">
-                  <Sprout className="h-3 w-3 text-[#143624]" />
+                <span className="inline-flex items-center gap-1 rounded bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#0f7b3f] border border-[#e5e7eb]">
+                  <Sprout className="h-3 w-3 text-[#0f7b3f]" />
                   {product.badge}
                 </span>
               </div>
@@ -167,39 +167,39 @@ export function ProductDetailClient({
           {/* Right Info */}
           <div className="space-y-6 lg:col-span-7">
             <div>
-              <div className="flex flex-wrap items-center gap-3 text-xs text-[#526559]">
-                <span className="rounded-full bg-[#f3efe6] px-3 py-1 font-bold text-[#14532d]">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[#6b7280]">
+                <span className="rounded-full bg-[#f3f4f6] px-3 py-1 font-bold text-[#0f7b3f]">
                   {lang === "bn"
                     ? product.category?.nameBn
                     : product.category?.nameEn}
                 </span>
-                <span className="inline-flex items-center gap-1 font-bold text-[#111c16]">
+                <span className="inline-flex items-center gap-1 font-bold text-[#111827]">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                   {ratingAvg.toFixed(1)} ({reviewCount}{" "}
                   {lang === "bn" ? "রিভিউ" : "reviews"})
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-[#16a34a]" />
+                  <Clock className="h-3.5 w-3.5 text-[#0f7b3f]" />
                   {product.harvestTime}
                 </span>
               </div>
 
-              <h1 className="mt-3 font-display text-3xl font-medium text-[#112218] sm:text-4xl">
+              <h1 className="mt-3 text-3xl font-medium text-[#111827] sm:text-4xl">
                 {lang === "bn" ? product.nameBn : product.nameEn}
               </h1>
-              <p className="mt-1 text-base font-medium text-[#526559]">
+              <p className="mt-1 text-base font-medium text-[#6b7280]">
                 {lang === "bn" ? product.nameEn : product.nameBn} •{" "}
                 {lang === "bn" ? product.subtitleBn : product.subtitleEn}
               </p>
             </div>
 
-            <p className="text-sm leading-relaxed text-[#4b5e52] sm:text-base">
+            <p className="text-sm leading-relaxed text-[#4b5563] sm:text-base">
               {lang === "bn" ? product.descriptionBn : product.descriptionEn}
             </p>
 
             {/* Variant Selector */}
             <div className="space-y-2.5">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#526559]">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#6b7280]">
                 {lang === "bn" ? "পরিমাণ বেছে নিন" : "Select Pack Size / Weight"}
               </p>
               <div className="flex flex-wrap gap-2.5">
@@ -212,12 +212,12 @@ export function ProductDetailClient({
                       onClick={() => setSelectedVarId(v.id)}
                       className={`rounded-2xl border px-4 py-2.5 text-left transition cursor-pointer ${
                         active
-                          ? "border-[#14532d] bg-[#ecfdf5] ring-2 ring-[#14532d]/20"
-                          : "border-[#e4e0d5] bg-white hover:border-emerald-300"
+                          ? "border-[#0f7b3f] bg-[#ecfdf5] ring-2 ring-[#0f7b3f]/20"
+                          : "border-[#e5e7eb] bg-white hover:border-emerald-300"
                       }`}
                     >
-                      <p className="text-xs font-bold text-[#111c16]">{v.label}</p>
-                      <p className="font-mono text-sm font-extrabold text-[#14532d]">
+                      <p className="text-xs font-bold text-[#111827]">{v.label}</p>
+                      <p className="tabular-nums text-sm font-extrabold text-[#0f7b3f]">
                         {formatTaka(v.priceBdt, lang)}
                       </p>
                     </button>
@@ -228,25 +228,25 @@ export function ProductDetailClient({
 
             {/* Price + Add to Cart */}
             {activeVariant && (
-              <div className="flex flex-wrap items-center gap-4 rounded-3xl border border-[#e4e0d5] bg-white p-5">
+              <div className="flex flex-wrap items-center gap-4 rounded-3xl border border-[#e5e7eb] bg-white p-5">
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-3xl font-extrabold text-[#14532d]">
+                    <span className="tabular-nums text-3xl font-extrabold text-[#0f7b3f]">
                       {formatTaka(activeVariant.priceBdt * qty, lang)}
                     </span>
                     {activeVariant.compareAtBdt && (
-                      <span className="font-mono text-sm text-stone-400 line-through">
+                      <span className="tabular-nums text-sm text-stone-400 line-through">
                         {formatTaka(activeVariant.compareAtBdt * qty, lang)}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-[#526559]">
+                  <p className="text-xs text-[#6b7280]">
                     {activeVariant.stockQty} available in today&apos;s batch
                   </p>
                 </div>
 
                 <div className="ml-auto flex items-center gap-3">
-                  <div className="flex items-center gap-2 rounded-full border border-[#e4e0d5] bg-[#faf8f3] px-2 py-1.5">
+                  <div className="flex items-center gap-2 rounded-full border border-[#e5e7eb] bg-[#f9faf8] px-2 py-1.5">
                     <button
                       type="button"
                       onClick={() => setQty((q) => Math.max(1, q - 1))}
@@ -254,7 +254,7 @@ export function ProductDetailClient({
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
-                    <span className="min-w-6 text-center font-mono text-sm font-bold">
+                    <span className="min-w-6 text-center tabular-nums text-sm font-bold">
                       {qty}
                     </span>
                     <button
@@ -290,7 +290,7 @@ export function ProductDetailClient({
                         qty
                       )
                     }
-                    className="inline-flex items-center gap-2 rounded-full bg-[#14532d] px-6 py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#166534] disabled:opacity-50 transition cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#0f7b3f] px-6 py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#0b5e30] disabled:opacity-50 transition cursor-pointer"
                   >
                     <ShoppingBag className="h-4 w-4" />
                     <span>{lang === "bn" ? "ব্যাগে যোগ করুন" : "Add to Bazar Bag"}</span>
@@ -304,33 +304,33 @@ export function ProductDetailClient({
               {product.farmer && (
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#14532d]">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-[#16a34a]" />
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#0f7b3f]">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#0f7b3f]" />
                       {lang === "bn" ? "কৃষকের তথ্য" : "Farm Traceability"}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#166534]">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0b5e30]">
                       <MapPin className="h-3 w-3" />
                       {product.farmer.upazila}, {product.farmer.district}
                     </span>
                   </div>
-                  <p className="text-sm font-bold text-[#111c16]">
+                  <p className="text-sm font-bold text-[#111827]">
                     {lang === "bn" ? product.farmer.nameBn : product.farmer.name}
                   </p>
-                  <p className="text-xs leading-relaxed text-[#4b5e52]">
+                  <p className="text-xs leading-relaxed text-[#4b5563]">
                     {lang === "bn" ? product.farmer.storyBn : product.farmer.storyEn}
                   </p>
                 </div>
               )}
 
-              <div className="rounded-2xl border border-[#e4e0d5] bg-white p-4 space-y-2">
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111c16]">
+              <div className="rounded-2xl border border-[#e5e7eb] bg-white p-4 space-y-2">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111827]">
                   <ThermometerSnowflake className="h-4 w-4 text-sky-600" />
                   {lang === "bn" ? "সংরক্ষণ পরামর্শ" : "Storage & Freshness"}
                 </span>
-                <p className="text-xs leading-relaxed text-[#526559]">
+                <p className="text-xs leading-relaxed text-[#6b7280]">
                   {lang === "bn" ? product.storageTipBn : product.storageTipEn}
                 </p>
-                <p className="flex items-center gap-1.5 text-[11px] font-semibold text-[#16a34a]">
+                <p className="flex items-center gap-1.5 text-[11px] font-semibold text-[#0f7b3f]">
                   <ShieldCheck className="h-3.5 w-3.5" />
                   24-hour free replacement if bruised or not crisp
                 </p>
@@ -340,20 +340,20 @@ export function ProductDetailClient({
         </div>
 
         {/* Reviews Section */}
-        <section className="mt-14 grid gap-8 lg:grid-cols-12 border-t border-[#e4e0d5] pt-10">
+        <section className="mt-14 grid gap-8 lg:grid-cols-12 border-t border-[#e5e7eb] pt-10">
           <div className="lg:col-span-5">
-            <h2 className="text-xl font-extrabold text-[#111c16]">
+            <h2 className="text-xl font-extrabold text-[#111827]">
               {lang === "bn" ? "ক্রেতাদের অভিজ্ঞতা লিখুন" : "Share Your Harvest Review"}
             </h2>
-            <p className="mt-1 text-xs text-[#526559]">
+            <p className="mt-1 text-xs text-[#6b7280]">
               Help Dhaka families shop with confidence.
             </p>
             <form
               onSubmit={handleSubmitReview}
-              className="mt-4 space-y-3 rounded-3xl border border-[#e4e0d5] bg-white p-5"
+              className="mt-4 space-y-3 rounded-3xl border border-[#e5e7eb] bg-white p-5"
             >
               <div>
-                <label className="block text-xs font-bold text-[#111c16]">
+                <label className="block text-xs font-bold text-[#111827]">
                   Your Name & Area
                 </label>
                 <input
@@ -362,11 +362,11 @@ export function ProductDetailClient({
                   value={authorName}
                   onChange={(e) => setAuthorName(e.target.value)}
                   placeholder="e.g. Tasnim (Banani)"
-                  className="mt-1 w-full rounded-xl border border-[#dcd7c9] px-3 py-2 text-sm focus:border-[#166534] focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm focus:border-[#0b5e30] focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#111c16]">
+                <label className="block text-xs font-bold text-[#111827]">
                   Freshness Rating
                 </label>
                 <div className="mt-1 flex gap-1.5">
@@ -377,8 +377,8 @@ export function ProductDetailClient({
                       onClick={() => setRating(num)}
                       className={`rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer ${
                         rating >= num
-                          ? "bg-amber-400 text-[#111c16]"
-                          : "bg-[#f3efe6] text-[#526559]"
+                          ? "bg-amber-400 text-[#111827]"
+                          : "bg-[#f3f4f6] text-[#6b7280]"
                       }`}
                     >
                       {num} ★
@@ -387,7 +387,7 @@ export function ProductDetailClient({
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#111c16]">
+                <label className="block text-xs font-bold text-[#111827]">
                   Review
                 </label>
                 <textarea
@@ -396,13 +396,13 @@ export function ProductDetailClient({
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="How fresh was the produce and delivery slot?"
-                  className="mt-1 w-full rounded-xl border border-[#dcd7c9] px-3 py-2 text-sm focus:border-[#166534] focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm focus:border-[#0b5e30] focus:outline-none"
                 />
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-full bg-[#14532d] py-2.5 text-sm font-bold text-white hover:bg-[#166534] disabled:opacity-50 cursor-pointer"
+                className="w-full rounded-full bg-[#0f7b3f] py-2.5 text-sm font-bold text-white hover:bg-[#0b5e30] disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? "Submitting..." : "Publish Review"}
               </button>
@@ -410,23 +410,23 @@ export function ProductDetailClient({
           </div>
 
           <div className="lg:col-span-7 space-y-3">
-            <h2 className="text-xl font-extrabold text-[#111c16]">
+            <h2 className="text-xl font-extrabold text-[#111827]">
               Customer Reviews ({reviewCount})
             </h2>
             {reviewsList.map((rev) => (
               <div
                 key={rev.id}
-                className="rounded-2xl border border-[#e4e0d5] bg-white p-4"
+                className="rounded-2xl border border-[#e5e7eb] bg-white p-4"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-bold text-[#111c16]">
+                  <p className="text-sm font-bold text-[#111827]">
                     {rev.authorName}
                   </p>
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700">
                     {rev.rating}.0 ★
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-[#4b5e52]">{rev.comment}</p>
+                <p className="mt-2 text-sm text-[#4b5563]">{rev.comment}</p>
               </div>
             ))}
           </div>
@@ -434,8 +434,8 @@ export function ProductDetailClient({
 
         {/* Related */}
         {relatedProducts.length > 0 && (
-          <section className="mt-14 border-t border-[#e4e0d5] pt-10">
-            <h2 className="text-xl font-extrabold text-[#111c16] mb-5">
+          <section className="mt-14 border-t border-[#e5e7eb] pt-10">
+            <h2 className="text-xl font-extrabold text-[#111827] mb-5">
               {lang === "bn" ? "আরও তাজা পণ্য" : "Pair With Your Kitchen Bazar"}
             </h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -79,24 +79,24 @@ function SignInInner() {
 
   return (
     <div className="mx-auto w-full max-w-md px-4 py-12">
-      <div className="rounded-2xl border border-[#e7e2d8] bg-white p-7 sm:p-9">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#143624]">
+      <div className="rounded-2xl border border-[#e5e7eb] bg-white p-7 sm:p-9">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0f7b3f]">
           <Leaf className="h-3.5 w-3.5" />
           <span>sobji.com Account</span>
         </div>
-        <h1 className="mt-2 font-display text-2xl font-medium text-[#112218] sm:text-3xl">
+        <h1 className="mt-2 text-2xl font-medium text-[#111827] sm:text-3xl">
           {mode === "signin" ? "Sign in to your Bazar" : "Create your Sobji Account"}
         </h1>
-        <p className="mt-1 text-xs text-[#526559]">
+        <p className="mt-1 text-xs text-[#6b7280]">
           Manage orders, Sobji Club free delivery, addresses & weekly schedules.
         </p>
 
-        <div className="mt-5 grid grid-cols-2 rounded-full bg-[#f3efe6] p-1 text-xs font-bold">
+        <div className="mt-5 grid grid-cols-2 rounded-full bg-[#f3f4f6] p-1 text-xs font-bold">
           <button
             type="button"
             onClick={() => setMode("signin")}
             className={`rounded-full py-2 transition cursor-pointer ${
-              mode === "signin" ? "bg-white text-[#14532d] shadow-2xs" : "text-[#526559]"
+              mode === "signin" ? "bg-white text-[#0f7b3f] shadow-2xs" : "text-[#6b7280]"
             }`}
           >
             Sign In
@@ -105,7 +105,7 @@ function SignInInner() {
             type="button"
             onClick={() => setMode("signup")}
             className={`rounded-full py-2 transition cursor-pointer ${
-              mode === "signup" ? "bg-white text-[#14532d] shadow-2xs" : "text-[#526559]"
+              mode === "signup" ? "bg-white text-[#0f7b3f] shadow-2xs" : "text-[#6b7280]"
             }`}
           >
             Sign Up
@@ -115,7 +115,7 @@ function SignInInner() {
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {mode === "signup" && (
             <div>
-              <label className="block text-xs font-bold text-[#526559]">Full Name</label>
+              <label className="block text-xs font-bold text-[#6b7280]">Full Name</label>
               <div className="relative mt-1">
                 <User className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#7c8c82]" />
                 <input
@@ -124,14 +124,14 @@ function SignInInner() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your full name"
-                  className="w-full rounded-xl border border-[#dcd7c9] py-2.5 pl-10 pr-3 text-sm focus:border-[#166534] focus:outline-none"
+                  className="w-full rounded-xl border border-[#d1d5db] py-2.5 pl-10 pr-3 text-sm focus:border-[#0b5e30] focus:outline-none"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-bold text-[#526559]">Email Address</label>
+            <label className="block text-xs font-bold text-[#6b7280]">Email Address</label>
             <div className="relative mt-1">
               <Mail className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#7c8c82]" />
               <input
@@ -140,13 +140,13 @@ function SignInInner() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-[#dcd7c9] py-2.5 pl-10 pr-3 text-sm focus:border-[#166534] focus:outline-none"
+                className="w-full rounded-xl border border-[#d1d5db] py-2.5 pl-10 pr-3 text-sm focus:border-[#0b5e30] focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#526559]">Password</label>
+            <label className="block text-xs font-bold text-[#6b7280]">Password</label>
             <div className="relative mt-1">
               <Lock className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#7c8c82]" />
               <input
@@ -156,7 +156,7 @@ function SignInInner() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-[#dcd7c9] py-2.5 pl-10 pr-3 text-sm focus:border-[#166534] focus:outline-none"
+                className="w-full rounded-xl border border-[#d1d5db] py-2.5 pl-10 pr-3 text-sm focus:border-[#0b5e30] focus:outline-none"
               />
             </div>
           </div>
@@ -170,7 +170,7 @@ function SignInInner() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#14532d] py-3 text-sm font-bold text-white hover:bg-[#166534] disabled:opacity-60 transition cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0f7b3f] py-3 text-sm font-bold text-white hover:bg-[#0b5e30] disabled:opacity-60 transition cursor-pointer"
           >
             <span>
               {loading
@@ -184,8 +184,8 @@ function SignInInner() {
         </form>
 
         {/* Demo Quick Access */}
-        <div className="mt-6 border-t border-[#e4e0d5] pt-5 space-y-2">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-[#526559]">
+        <div className="mt-6 border-t border-[#e5e7eb] pt-5 space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
             Instant Demo Access
           </p>
           <div className="grid grid-cols-2 gap-2">
@@ -194,7 +194,7 @@ function SignInInner() {
               onClick={() =>
                 quickLogin("customer@sobji.com", "SobjiUser2026!", "/account")
               }
-              className="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 text-xs font-bold text-[#14532d] hover:bg-emerald-100 cursor-pointer"
+              className="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 text-xs font-bold text-[#0f7b3f] hover:bg-emerald-100 cursor-pointer"
             >
               Demo Customer
             </button>
@@ -209,9 +209,9 @@ function SignInInner() {
               Demo Admin
             </button>
           </div>
-          <p className="text-center text-[11px] text-[#526559] pt-1">
+          <p className="text-center text-[11px] text-[#6b7280] pt-1">
             Or continue shopping as guest and{" "}
-            <Link href="/checkout" className="font-bold text-[#14532d] underline">
+            <Link href="/checkout" className="font-bold text-[#0f7b3f] underline">
               checkout directly
             </Link>
             .

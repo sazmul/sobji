@@ -144,28 +144,28 @@ export default function AccountPage() {
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
         {loading || !data ? (
-          <div className="rounded-3xl border border-[#e4e0d5] bg-white p-12 text-center text-sm text-[#526559]">
+          <div className="rounded-3xl border border-[#e5e7eb] bg-white p-12 text-center text-sm text-[#6b7280]">
             Loading your Sobji account...
           </div>
         ) : (
           <div className="space-y-8">
             {/* Header & Membership */}
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="flex flex-col justify-between rounded-2xl border border-[#e7e2d8] bg-white p-6 lg:col-span-7">
+              <div className="flex flex-col justify-between rounded-2xl border border-[#e5e7eb] bg-white p-6 lg:col-span-7">
                 <div>
-                  <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-[#143624]">
+                  <p className="tabular-nums text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0f7b3f]">
                     Customer Profile
                   </p>
-                  <h1 className="mt-1 font-display text-3xl font-medium text-[#112218]">
+                  <h1 className="mt-1 text-3xl font-medium text-[#111827]">
                     {data.user.name}
                   </h1>
-                  <p className="text-sm text-[#526559]">{data.user.email}</p>
+                  <p className="text-sm text-[#6b7280]">{data.user.email}</p>
                 </div>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {data.user.role === "admin" && (
                     <Link
                       href="/admin"
-                      className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-4 py-2 text-xs font-extrabold text-[#111c16]"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-4 py-2 text-xs font-extrabold text-[#111827]"
                     >
                       <LayoutDashboard className="h-3.5 w-3.5" />
                       Open Admin Portal
@@ -174,7 +174,7 @@ export default function AccountPage() {
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#dcd7c9] px-4 py-2 text-xs font-bold text-[#111c16] hover:bg-stone-50 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#d1d5db] px-4 py-2 text-xs font-bold text-[#111827] hover:bg-stone-50 cursor-pointer"
                   >
                     <LogOut className="h-3.5 w-3.5" />
                     Sign Out
@@ -182,7 +182,7 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-[#143624] p-6 text-white lg:col-span-5">
+              <div className="rounded-2xl bg-[#0f7b3f] p-6 text-white lg:col-span-5">
                 <div className="flex items-center justify-between">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-3 py-1 text-xs font-bold text-amber-300">
                     <Sparkles className="h-3.5 w-3.5" />
@@ -206,7 +206,7 @@ export default function AccountPage() {
                   <button
                     type="button"
                     onClick={handleActivateClub}
-                    className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-xs font-extrabold text-[#111c16] hover:bg-amber-300 cursor-pointer"
+                    className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-xs font-extrabold text-[#111827] hover:bg-amber-300 cursor-pointer"
                   >
                     Activate Free Trial
                   </button>
@@ -216,15 +216,15 @@ export default function AccountPage() {
 
             {/* Orders + Weekly Subscriptions */}
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="rounded-3xl border border-[#e4e0d5] bg-white p-6 lg:col-span-7 space-y-4">
-                <h2 className="flex items-center gap-2 text-lg font-extrabold text-[#111c16]">
-                  <Package className="h-5 w-5 text-[#16a34a]" />
+              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 lg:col-span-7 space-y-4">
+                <h2 className="flex items-center gap-2 text-lg font-extrabold text-[#111827]">
+                  <Package className="h-5 w-5 text-[#0f7b3f]" />
                   <span>Your Bazar Orders ({data.orders.length})</span>
                 </h2>
                 {data.orders.length === 0 ? (
-                  <p className="text-sm text-[#526559]">
+                  <p className="text-sm text-[#6b7280]">
                     No orders yet.{" "}
-                    <Link href="/" className="font-bold text-[#14532d] underline">
+                    <Link href="/" className="font-bold text-[#0f7b3f] underline">
                       Shop fresh produce
                     </Link>
                   </p>
@@ -233,34 +233,34 @@ export default function AccountPage() {
                     {data.orders.map((ord) => (
                       <div
                         key={ord.id}
-                        className="rounded-2xl border border-[#e4e0d5] bg-[#faf8f3] p-4"
+                        className="rounded-2xl border border-[#e5e7eb] bg-[#f9faf8] p-4"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
-                            <span className="font-mono text-sm font-extrabold text-[#14532d]">
+                            <span className="tabular-nums text-sm font-extrabold text-[#0f7b3f]">
                               {ord.orderCode}
                             </span>
-                            <p className="text-xs text-[#526559]">
+                            <p className="text-xs text-[#6b7280]">
                               {ord.deliveryDate} • {ord.slotLabel}
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold uppercase text-[#14532d]">
+                            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold uppercase text-[#0f7b3f]">
                               {ord.status.replaceAll("_", " ")}
                             </span>
-                            <span className="font-mono text-sm font-extrabold text-[#111c16]">
+                            <span className="tabular-nums text-sm font-extrabold text-[#111827]">
                               {formatTaka(ord.totalBdt, lang)}
                             </span>
                           </div>
                         </div>
-                        <p className="mt-2 text-xs text-[#4b5e52]">
+                        <p className="mt-2 text-xs text-[#4b5563]">
                           {ord.items
                             .map((i) => `${i.productNameEn} (${i.variantLabel}) ×${i.quantity}`)
                             .join(", ")}
                         </p>
                         <Link
                           href={`/track?code=${ord.orderCode}`}
-                          className="mt-2 inline-block text-xs font-bold text-[#14532d] hover:underline"
+                          className="mt-2 inline-block text-xs font-bold text-[#0f7b3f] hover:underline"
                         >
                           Live Track →
                         </Link>
@@ -272,32 +272,32 @@ export default function AccountPage() {
 
               {/* Weekly Subscriptions & Addresses */}
               <div className="space-y-6 lg:col-span-5">
-                <div className="rounded-3xl border border-[#e4e0d5] bg-white p-6 space-y-3">
-                  <h2 className="flex items-center gap-2 text-base font-extrabold text-[#111c16]">
+                <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-3">
+                  <h2 className="flex items-center gap-2 text-base font-extrabold text-[#111827]">
                     <Repeat className="h-4 w-4 text-[#d97706]" />
                     <span>Weekly Auto-Bazar ({data.subscriptions.length})</span>
                   </h2>
                   {data.subscriptions.length === 0 ? (
-                    <p className="text-xs text-[#526559]">
+                    <p className="text-xs text-[#6b7280]">
                       Tick &ldquo;Repeat weekly&rdquo; during checkout to automate your weekly kitchen vegetables.
                     </p>
                   ) : (
                     data.subscriptions.map((sub) => (
                       <div
                         key={sub.id}
-                        className="rounded-2xl border border-[#e4e0d5] p-3.5 text-xs space-y-2"
+                        className="rounded-2xl border border-[#e5e7eb] p-3.5 text-xs space-y-2"
                       >
                         <div className="flex justify-between font-bold">
                           <span>{sub.title}</span>
-                          <span className="font-mono text-[#14532d]">
+                          <span className="tabular-nums text-[#0f7b3f]">
                             {formatTaka(sub.totalBdt, lang)}
                           </span>
                         </div>
-                        <p className="text-[#526559]">
+                        <p className="text-[#6b7280]">
                           Next: {sub.nextDeliveryDate} • {sub.preferredSlot}
                         </p>
                         <div className="flex items-center justify-between">
-                          <span className="uppercase font-bold text-[#16a34a]">
+                          <span className="uppercase font-bold text-[#0f7b3f]">
                             {sub.status}
                           </span>
                           <button
@@ -308,7 +308,7 @@ export default function AccountPage() {
                                 sub.status === "active" ? "paused" : "active"
                               )
                             }
-                            className="rounded-full bg-[#f3efe6] px-3 py-1 font-bold text-[#111c16] cursor-pointer"
+                            className="rounded-full bg-[#f3f4f6] px-3 py-1 font-bold text-[#111827] cursor-pointer"
                           >
                             {sub.status === "active" ? "Pause" : "Resume"}
                           </button>
@@ -319,22 +319,22 @@ export default function AccountPage() {
                 </div>
 
                 {/* Saved Addresses */}
-                <div className="rounded-3xl border border-[#e4e0d5] bg-white p-6 space-y-4">
-                  <h2 className="flex items-center gap-2 text-base font-extrabold text-[#111c16]">
-                    <MapPin className="h-4 w-4 text-[#16a34a]" />
+                <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
+                  <h2 className="flex items-center gap-2 text-base font-extrabold text-[#111827]">
+                    <MapPin className="h-4 w-4 text-[#0f7b3f]" />
                     <span>Saved Dhaka Addresses</span>
                   </h2>
                   {data.addresses.map((addr) => (
                     <div
                       key={addr.id}
-                      className="flex items-start justify-between gap-2 rounded-2xl border border-[#e4e0d5] p-3 text-xs"
+                      className="flex items-start justify-between gap-2 rounded-2xl border border-[#e5e7eb] p-3 text-xs"
                     >
                       <div>
-                        <p className="font-bold text-[#111c16]">
+                        <p className="font-bold text-[#111827]">
                           {addr.label} • {addr.area}
                         </p>
-                        <p className="text-[#526559]">{addr.fullAddress}</p>
-                        <p className="font-mono text-[#526559]">{addr.phone}</p>
+                        <p className="text-[#6b7280]">{addr.fullAddress}</p>
+                        <p className="tabular-nums text-[#6b7280]">{addr.phone}</p>
                       </div>
                       <button
                         type="button"
@@ -345,21 +345,21 @@ export default function AccountPage() {
                       </button>
                     </div>
                   ))}
-                  <form onSubmit={handleAddAddress} className="space-y-2 border-t border-[#e4e0d5] pt-3">
+                  <form onSubmit={handleAddAddress} className="space-y-2 border-t border-[#e5e7eb] pt-3">
                     <div className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
                         value={label}
                         onChange={(e) => setLabel(e.target.value)}
                         placeholder="Label (Home)"
-                        className="rounded-xl border border-[#dcd7c9] px-3 py-2 text-xs"
+                        className="rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
                       />
                       <input
                         type="text"
                         value={area}
                         onChange={(e) => setArea(e.target.value)}
                         placeholder="Area (Dhanmondi)"
-                        className="rounded-xl border border-[#dcd7c9] px-3 py-2 text-xs"
+                        className="rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
                       />
                     </div>
                     <input
@@ -368,7 +368,7 @@ export default function AccountPage() {
                       value={fullAddress}
                       onChange={(e) => setFullAddress(e.target.value)}
                       placeholder="House, Road, Flat"
-                      className="w-full rounded-xl border border-[#dcd7c9] px-3 py-2 text-xs"
+                      className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
                     />
                     <input
                       type="tel"
@@ -376,11 +376,11 @@ export default function AccountPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="017XX-XXXXXX"
-                      className="w-full rounded-xl border border-[#dcd7c9] px-3 py-2 text-xs"
+                      className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-xs"
                     />
                     <button
                       type="submit"
-                      className="inline-flex w-full items-center justify-center gap-1 rounded-full bg-[#14532d] py-2 text-xs font-bold text-white cursor-pointer"
+                      className="inline-flex w-full items-center justify-center gap-1 rounded-full bg-[#0f7b3f] py-2 text-xs font-bold text-white cursor-pointer"
                     >
                       <Plus className="h-3.5 w-3.5" />
                       Save Address

@@ -161,23 +161,23 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6">
-        <h1 className="font-display text-3xl font-medium text-[#112218] sm:text-4xl">
+        <h1 className="text-3xl font-medium text-[#111827] sm:text-4xl">
           {lang === "bn" ? "চেকআউট ও ডেলিভারি" : "Complete Your Bazar Order"}
         </h1>
-        <p className="mt-1 text-sm text-[#526559]">
+        <p className="mt-1 text-sm text-[#6b7280]">
           {lang === "bn"
             ? "ভোর ৬টা থেকে রাত ৯টার মধ্যে পছন্দের স্লটে তাজা ডেলিভারি নিন"
             : "Select your Dhaka address, morning/express slot & payment method."}
         </p>
 
         {items.length === 0 ? (
-          <div className="mt-10 rounded-3xl border border-[#e4e0d5] bg-white p-12 text-center">
-            <p className="text-lg font-bold text-[#111c16]">
+          <div className="mt-10 rounded-3xl border border-[#e5e7eb] bg-white p-12 text-center">
+            <p className="text-lg font-bold text-[#111827]">
               Your bazar bag is currently empty
             </p>
             <Link
               href="/#catalog"
-              className="mt-4 inline-flex rounded-full bg-[#14532d] px-6 py-3 text-sm font-bold text-white"
+              className="mt-4 inline-flex rounded-full bg-[#0f7b3f] px-6 py-3 text-sm font-bold text-white"
             >
               Browse Fresh Vegetables
             </Link>
@@ -190,16 +190,16 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
             {/* Left Form */}
             <div className="space-y-6 lg:col-span-7">
               {/* Customer & Address */}
-              <div className="rounded-3xl border border-[#e4e0d5] bg-white p-6 space-y-4">
-                <h2 className="flex items-center gap-2 text-base font-bold text-[#111c16]">
-                  <MapPin className="h-4 w-4 text-[#16a34a]" />
+              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
+                <h2 className="flex items-center gap-2 text-base font-bold text-[#111827]">
+                  <MapPin className="h-4 w-4 text-[#0f7b3f]" />
                   <span>
                     {lang === "bn" ? "ডেলিভারি ঠিকানা" : "1. Delivery Details"}
                   </span>
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-xs font-bold text-[#526559]">
+                    <label className="block text-xs font-bold text-[#6b7280]">
                       Full Name *
                     </label>
                     <input
@@ -208,11 +208,11 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="e.g. Nusrat Jahan"
-                      className="mt-1 w-full rounded-xl border border-[#dcd7c9] px-3.5 py-2.5 text-sm focus:border-[#166534] focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-[#d1d5db] px-3.5 py-2.5 text-sm focus:border-[#0b5e30] focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#526559]">
+                    <label className="block text-xs font-bold text-[#6b7280]">
                       Mobile Number (BD) *
                     </label>
                     <input
@@ -221,17 +221,17 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="017XX-XXXXXX"
-                      className="mt-1 w-full rounded-xl border border-[#dcd7c9] px-3.5 py-2.5 text-sm focus:border-[#166534] focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-[#d1d5db] px-3.5 py-2.5 text-sm focus:border-[#0b5e30] focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#526559]">
+                    <label className="block text-xs font-bold text-[#6b7280]">
                       Dhaka Area *
                     </label>
                     <select
                       value={deliveryArea}
                       onChange={(e) => setDeliveryArea(e.target.value)}
-                      className="mt-1 w-full rounded-xl border border-[#dcd7c9] bg-white px-3.5 py-2.5 text-sm focus:border-[#166534] focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-[#d1d5db] bg-white px-3.5 py-2.5 text-sm focus:border-[#0b5e30] focus:outline-none"
                     >
                       {DHAKA_AREAS.map((area) => (
                         <option key={area} value={area}>
@@ -241,7 +241,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#526559]">
+                    <label className="block text-xs font-bold text-[#6b7280]">
                       Email (Optional)
                     </label>
                     <input
@@ -249,12 +249,12 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       placeholder="you@example.com"
-                      className="mt-1 w-full rounded-xl border border-[#dcd7c9] px-3.5 py-2.5 text-sm focus:border-[#166534] focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-[#d1d5db] px-3.5 py-2.5 text-sm focus:border-[#0b5e30] focus:outline-none"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#526559]">
+                  <label className="block text-xs font-bold text-[#6b7280]">
                     House, Road, Flat No. *
                   </label>
                   <input
@@ -263,11 +263,11 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                     value={deliveryAddress}
                     onChange={(e) => setDeliveryAddress(e.target.value)}
                     placeholder="House 14, Road 6, Apt 4B"
-                    className="mt-1 w-full rounded-xl border border-[#dcd7c9] px-3.5 py-2.5 text-sm focus:border-[#166534] focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-[#d1d5db] px-3.5 py-2.5 text-sm focus:border-[#0b5e30] focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#526559]">
+                  <label className="block text-xs font-bold text-[#6b7280]">
                     Rider Note (Optional)
                   </label>
                   <input
@@ -275,15 +275,15 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                     value={deliveryNotes}
                     onChange={(e) => setDeliveryNotes(e.target.value)}
                     placeholder="Ring bell twice or leave with security guard"
-                    className="mt-1 w-full rounded-xl border border-[#dcd7c9] px-3.5 py-2.5 text-sm focus:border-[#166534] focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-[#d1d5db] px-3.5 py-2.5 text-sm focus:border-[#0b5e30] focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Delivery Slot */}
-              <div className="rounded-3xl border border-[#e4e0d5] bg-white p-6 space-y-4">
+              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h2 className="flex items-center gap-2 text-base font-bold text-[#111c16]">
+                  <h2 className="flex items-center gap-2 text-base font-bold text-[#111827]">
                     <Clock className="h-4 w-4 text-[#d97706]" />
                     <span>
                       {lang === "bn" ? "ডেলিভারি তারিখ ও স্লট" : "2. Delivery Slot"}
@@ -293,7 +293,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="rounded-xl border border-[#dcd7c9] px-3 py-1.5 text-xs font-semibold text-[#111c16]"
+                    className="rounded-xl border border-[#d1d5db] px-3 py-1.5 text-xs font-semibold text-[#111827]"
                   />
                 </div>
 
@@ -307,12 +307,12 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                         onClick={() => setSlotId(slot.id)}
                         className={`rounded-2xl border p-3.5 text-left transition cursor-pointer ${
                           selected
-                            ? "border-[#14532d] bg-[#ecfdf5] ring-2 ring-[#14532d]/20"
-                            : "border-[#e4e0d5] bg-[#faf8f3] hover:border-emerald-300"
+                            ? "border-[#0f7b3f] bg-[#ecfdf5] ring-2 ring-[#0f7b3f]/20"
+                            : "border-[#e5e7eb] bg-[#f9faf8] hover:border-emerald-300"
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-bold text-[#111c16]">
+                          <span className="text-xs font-bold text-[#111827]">
                             {lang === "bn" ? slot.labelBn : slot.labelEn}
                           </span>
                           {slot.isExpress && (
@@ -321,7 +321,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 font-mono text-xs font-semibold text-[#14532d]">
+                        <p className="mt-1 tabular-nums text-xs font-semibold text-[#0f7b3f]">
                           {slot.windowText}
                         </p>
                       </button>
@@ -335,14 +335,14 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                     type="checkbox"
                     checked={isRecurringWeekly}
                     onChange={(e) => setIsRecurringWeekly(e.target.checked)}
-                    className="mt-1 h-4 w-4 accent-[#14532d]"
+                    className="mt-1 h-4 w-4 accent-[#0f7b3f]"
                   />
                   <div className="text-xs">
-                    <p className="font-bold text-[#14532d] flex items-center gap-1.5">
+                    <p className="font-bold text-[#0f7b3f] flex items-center gap-1.5">
                       <Repeat className="h-3.5 w-3.5" />
                       Repeat this bazar weekly (Auto-Schedule)
                     </p>
-                    <p className="text-[#526559] mt-0.5">
+                    <p className="text-[#6b7280] mt-0.5">
                       Pause or adjust anytime from your Account dashboard.
                     </p>
                   </div>
@@ -350,9 +350,9 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
               </div>
 
               {/* Payment Method */}
-              <div className="rounded-3xl border border-[#e4e0d5] bg-white p-6 space-y-4">
-                <h2 className="flex items-center gap-2 text-base font-bold text-[#111c16]">
-                  <CreditCard className="h-4 w-4 text-[#16a34a]" />
+              <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-4">
+                <h2 className="flex items-center gap-2 text-base font-bold text-[#111827]">
+                  <CreditCard className="h-4 w-4 text-[#0f7b3f]" />
                   <span>
                     {lang === "bn" ? "পেমেন্ট পদ্ধতি" : "3. Payment Method"}
                   </span>
@@ -386,19 +386,19 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       onClick={() => setPaymentMethod(pm.id)}
                       className={`rounded-2xl border p-3.5 text-left transition cursor-pointer ${
                         paymentMethod === pm.id
-                          ? "border-[#14532d] bg-[#ecfdf5] ring-2 ring-[#14532d]/20"
-                          : "border-[#e4e0d5] bg-[#faf8f3]"
+                          ? "border-[#0f7b3f] bg-[#ecfdf5] ring-2 ring-[#0f7b3f]/20"
+                          : "border-[#e5e7eb] bg-[#f9faf8]"
                       }`}
                     >
-                      <p className="text-sm font-bold text-[#111c16]">{pm.title}</p>
-                      <p className="text-xs text-[#526559]">{pm.sub}</p>
+                      <p className="text-sm font-bold text-[#111827]">{pm.title}</p>
+                      <p className="text-xs text-[#6b7280]">{pm.sub}</p>
                     </button>
                   ))}
                 </div>
 
                 {paymentMethod !== "cod" && (
-                  <div className="rounded-2xl bg-[#faf8f3] p-4 border border-[#e4e0d5]">
-                    <label className="block text-xs font-bold text-[#111c16]">
+                  <div className="rounded-2xl bg-[#f9faf8] p-4 border border-[#e5e7eb]">
+                    <label className="block text-xs font-bold text-[#111827]">
                       Merchant Number: 01700-762544 • Transaction ID (Optional for demo)
                     </label>
                     <input
@@ -406,7 +406,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       value={paymentRef}
                       onChange={(e) => setPaymentRef(e.target.value)}
                       placeholder="e.g. BKX928174 (auto-verified if blank)"
-                      className="mt-1.5 w-full rounded-xl border border-[#dcd7c9] bg-white px-3.5 py-2 text-sm focus:border-[#166534] focus:outline-none"
+                      className="mt-1.5 w-full rounded-xl border border-[#d1d5db] bg-white px-3.5 py-2 text-sm focus:border-[#0b5e30] focus:outline-none"
                     />
                   </div>
                 )}
@@ -415,8 +415,8 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
 
             {/* Right Summary */}
             <div className="lg:col-span-5">
-              <div className="sticky top-24 rounded-3xl border border-[#e4e0d5] bg-white p-6 space-y-5 shadow-sm">
-                <h2 className="text-lg font-extrabold text-[#111c16]">
+              <div className="sticky top-24 rounded-3xl border border-[#e5e7eb] bg-white p-6 space-y-5 shadow-sm">
+                <h2 className="text-lg font-extrabold text-[#111827]">
                   Order Summary ({items.length})
                 </h2>
 
@@ -427,7 +427,7 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                       className="flex items-center justify-between gap-3 text-sm"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-[#e7e2d8]">
+                        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-[#e5e7eb]">
                           <ProduceArtwork
                             visualKey={item.visualKey}
                             imageUrl={item.imageUrl}
@@ -435,15 +435,15 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                           />
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate font-bold text-[#111c16]">
+                          <p className="truncate font-bold text-[#111827]">
                             {lang === "bn" ? item.nameBn : item.nameEn}
                           </p>
-                          <p className="text-xs text-[#526559]">
+                          <p className="text-xs text-[#6b7280]">
                             {item.variantLabel} × {item.quantity}
                           </p>
                         </div>
                       </div>
-                      <span className="font-mono font-bold text-[#14532d]">
+                      <span className="tabular-nums font-bold text-[#0f7b3f]">
                         {formatTaka(item.priceBdt * item.quantity, lang)}
                       </span>
                     </div>
@@ -451,29 +451,29 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                 </div>
 
                 {/* Coupon */}
-                <div className="border-t border-[#e4e0d5] pt-4">
+                <div className="border-t border-[#e5e7eb] pt-4">
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Tag className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#526559]" />
+                      <Tag className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#6b7280]" />
                       <input
                         type="text"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value)}
                         placeholder="Promo code (SOBJI10)"
-                        className="w-full rounded-xl border border-[#dcd7c9] py-2 pl-9 pr-3 text-xs font-semibold uppercase focus:border-[#166534] focus:outline-none"
+                        className="w-full rounded-xl border border-[#d1d5db] py-2 pl-9 pr-3 text-xs font-semibold uppercase focus:border-[#0b5e30] focus:outline-none"
                       />
                     </div>
                     <button
                       type="button"
                       disabled={couponLoading}
                       onClick={handleApplyCoupon}
-                      className="rounded-xl bg-[#f3efe6] px-4 py-2 text-xs font-bold text-[#14532d] hover:bg-emerald-100 cursor-pointer"
+                      className="rounded-xl bg-[#f3f4f6] px-4 py-2 text-xs font-bold text-[#0f7b3f] hover:bg-emerald-100 cursor-pointer"
                     >
                       {couponLoading ? "..." : "Apply"}
                     </button>
                   </div>
                   {appliedCoupon && (
-                    <p className="mt-1.5 flex items-center gap-1 text-xs font-semibold text-[#16a34a]">
+                    <p className="mt-1.5 flex items-center gap-1 text-xs font-semibold text-[#0f7b3f]">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       {appliedCoupon.code}: {appliedCoupon.descriptionEn}
                     </p>
@@ -481,33 +481,33 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                 </div>
 
                 {/* Totals */}
-                <div className="space-y-2 border-t border-[#e4e0d5] pt-4 text-sm">
-                  <div className="flex justify-between text-[#526559]">
+                <div className="space-y-2 border-t border-[#e5e7eb] pt-4 text-sm">
+                  <div className="flex justify-between text-[#6b7280]">
                     <span>Bazar Subtotal</span>
-                    <span className="font-mono font-semibold text-[#111c16]">
+                    <span className="tabular-nums font-semibold text-[#111827]">
                       {formatTaka(subtotal, lang)}
                     </span>
                   </div>
                   {discount > 0 && (
-                    <div className="flex justify-between text-[#16a34a]">
+                    <div className="flex justify-between text-[#0f7b3f]">
                       <span>Coupon Discount</span>
-                      <span className="font-mono font-semibold">
+                      <span className="tabular-nums font-semibold">
                         -{formatTaka(discount, lang)}
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between text-[#526559]">
+                  <div className="flex justify-between text-[#6b7280]">
                     <span className="flex items-center gap-1">
                       <Truck className="h-3.5 w-3.5" />
                       Delivery ({activeSlot?.windowText})
                     </span>
-                    <span className="font-mono font-semibold text-[#111c16]">
+                    <span className="tabular-nums font-semibold text-[#111827]">
                       {deliveryFee === 0 ? "FREE" : formatTaka(deliveryFee, lang)}
                     </span>
                   </div>
-                  <div className="flex justify-between border-t border-[#e4e0d5] pt-3 text-base font-extrabold text-[#111c16]">
+                  <div className="flex justify-between border-t border-[#e5e7eb] pt-3 text-base font-extrabold text-[#111827]">
                     <span>Total Payable</span>
-                    <span className="font-mono text-xl text-[#14532d]">
+                    <span className="tabular-nums text-xl text-[#0f7b3f]">
                       {formatTaka(finalTotal, lang)}
                     </span>
                   </div>
@@ -525,13 +525,13 @@ export function CheckoutClient({ slots }: { slots: DeliverySlot[] }) {
                 <button
                   type="submit"
                   disabled={placing}
-                  className="w-full rounded-full bg-[#14532d] py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#166534] disabled:opacity-60 transition cursor-pointer"
+                  className="w-full rounded-full bg-[#0f7b3f] py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#0b5e30] disabled:opacity-60 transition cursor-pointer"
                 >
                   {placing ? "Confirming Order..." : "Confirm Bazar Order"}
                 </button>
 
-                <p className="flex items-center justify-center gap-1.5 text-[11px] text-[#526559]">
-                  <ShieldCheck className="h-3.5 w-3.5 text-[#16a34a]" />
+                <p className="flex items-center justify-center gap-1.5 text-[11px] text-[#6b7280]">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#0f7b3f]" />
                   <span>24h Freshness Guarantee • Direct Farm Dispatch</span>
                 </p>
               </div>
